@@ -10,10 +10,16 @@ os.makedirs(TRANSCRIPT_DIR, exist_ok=True)
 def transcribe_audio(audio_path: str, source_language: str = "en") -> dict:
     model = get_whisper_model()
 
+    transcribe_kwargs = {
+        "beam_size": 5
+    }
+
+    if source_language != "auto":
+        transcribe_kwargs["language"] = source_language
+
     segments, info = model.transcribe(
         audio_path,
-        language=source_language,
-        beam_size=5
+        **transcribe_kwargs
     )
 
     transcript_parts = []
