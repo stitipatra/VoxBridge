@@ -5,6 +5,8 @@ from app.services.translation_service import translate_text
 from app.services.output_service import save_text_output
 from app.services.media_service import extract_audio_from_video, convert_audio_to_wav
 from app.services.transcription_service import transcribe_audio
+from app.services.subtitle_service import generate_srt
+
 
 router = APIRouter(prefix="/process", tags=["Process"])
 
@@ -26,6 +28,10 @@ def process_file(request: ProcessRequest):
                 audio_path,
                 request.source_language
             )
+            subtitle_path = generate_srt(
+                transcription_result["segments"],
+                "original_subtitles"
+            )
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
@@ -39,20 +45,38 @@ def process_file(request: ProcessRequest):
             "transcript_text": transcription_result["transcript_text"],
             "transcript_path": transcription_result["transcript_path"],
             "segments": transcription_result["segments"],
+            "subtitle_path": subtitle_path,
             "status": "completed"
         }
 
     if request.input_type == "audio":
         try:
             audio_path = convert_audio_to_wav(request.input_path)
+
+            transcription_result = transcribe_audio(
+                audio_path,
+                request.source_language
+            )
+
+            subtitle_path = generate_srt(
+                transcription_result["segments"],
+                "audio_subtitles"
+            )
+
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
         return {
-            "message": "Audio converted successfully",
+            "message": "Audio transcribed successfully",
             "input_type": request.input_type,
             "input_path": request.input_path,
             "audio_output_path": audio_path,
+            "detected_language": transcription_result["detected_language"],
+            "duration": transcription_result["duration"],
+            "transcript_text": transcription_result["transcript_text"],
+            "transcript_path": transcription_result["transcript_path"],
+            "subtitle_path": subtitle_path,
+            "segments": transcription_result["segments"],
             "status": "completed"
         }
 
