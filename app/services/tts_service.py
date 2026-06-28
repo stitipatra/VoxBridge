@@ -8,15 +8,29 @@ TTS_OUTPUT_DIR = os.path.join("storage", "audio_output")
 os.makedirs(TTS_OUTPUT_DIR, exist_ok=True)
 
 VOICE_CODES = {
-    "en": "en",
-    "hi": "hi",
-    "mr": "mr"
+    "en": {
+        "male": "en+m3",
+        "female": "en+f3"
+    },
+    "hi": {
+        "male": "hi+m3",
+        "female": "hi+f3"
+    },
+    "mr": {
+        "male": "mr+m3",
+        "female": "mr+f3"
+    }
 }
 
 
-def generate_speech(text: str, target_language: str) -> str:
+def generate_speech(text: str, target_language: str, voice_gender: str = "male") -> str:
     if target_language not in VOICE_CODES:
         raise ValueError(f"Unsupported TTS language: {target_language}")
+
+    if voice_gender not in VOICE_CODES[target_language]:
+        raise ValueError(f"Unsupported voice gender: {voice_gender}")
+
+    voice_code = VOICE_CODES[target_language][voice_gender]
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     input_text_path = os.path.join(
@@ -33,7 +47,7 @@ def generate_speech(text: str, target_language: str) -> str:
 
     command = [
         ESPEAK_PATH,
-        "-v", VOICE_CODES[target_language],
+        "-v", voice_code,
         "--path", ESPEAK_DATA_PATH,
         "-w", output_audio_path,
         "-f", input_text_path

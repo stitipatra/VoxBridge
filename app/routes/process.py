@@ -5,7 +5,7 @@ from app.services.translation_service import translate_text
 from app.services.output_service import save_text_output
 from app.services.media_service import extract_audio_from_video, convert_audio_to_wav
 from app.services.transcription_service import transcribe_audio
-from app.services.subtitle_service import generate_srt, generate_translated_srt
+from app.services.subtitle_service import generate_srt, split_segments_for_subtitles
 from app.services.tts_service import generate_speech
 from app.services.video_service import merge_audio_with_video
 
@@ -17,6 +17,7 @@ class ProcessRequest(BaseModel):
     input_path: str
     source_language: str
     target_language: str
+    voice_gender: str = "male"
 
 
 def resolve_source_language(requested_language: str, detected_language: str) -> str:
@@ -25,11 +26,35 @@ def resolve_source_language(requested_language: str, detected_language: str) -> 
     return requested_language
 
 
+def translate_segments(
+    segments: list,
+    source_language: str,
+    target_language: str
+) -> list:
+    translated_segments = []
+
+    for segment in segments:
+        translated_segment_text = translate_text(
+            segment["text"],
+            source_language,
+            target_language
+        )
+
+        translated_segments.append({
+            "start": segment["start"],
+            "end": segment["end"],
+            "text": translated_segment_text
+        })
+
+    return translated_segments
+
+
 def process_speech_input(
     input_type: str,
     input_path: str,
     source_language: str,
-    target_language: str
+    target_language: str,
+    voice_gender: str
 ):
     translated_video_path = None
 
@@ -72,15 +97,26 @@ def process_speech_input(
         original_subtitle_name
     )
 
-    translated_subtitle_path = generate_translated_srt(
+    translated_segments = translate_segments(
         transcription_result["segments"],
-        translated_text,
+        resolved_language,
+        target_language
+    )
+
+    translated_segments = split_segments_for_subtitles(
+        translated_segments,
+        max_chars=45
+    )
+
+    translated_subtitle_path = generate_srt(
+        translated_segments,
         translated_subtitle_name
     )
 
     translated_audio_path = generate_speech(
         translated_text,
-        target_language
+        target_language,
+        voice_gender
     )
 
     if input_type == "video":
@@ -108,6 +144,7 @@ def process_speech_input(
         "translated_audio_path": translated_audio_path,
         "translated_video_path": translated_video_path,
         "segments": transcription_result["segments"],
+        "translated_segments": translated_segments,
         "status": "completed"
     }
 
@@ -120,7 +157,8 @@ def process_file(request: ProcessRequest):
                 request.input_type,
                 request.input_path,
                 request.source_language,
-                request.target_language
+                request.target_language,
+                request.voice_gender
             )
 
         if request.input_type != "text":
@@ -150,7 +188,8 @@ def process_file(request: ProcessRequest):
 
         translated_audio_path = generate_speech(
             translated_text,
-            request.target_language
+            request.target_language,
+            request.voice_gender
         )
 
         return {

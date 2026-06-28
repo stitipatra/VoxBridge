@@ -54,3 +54,51 @@ def generate_translated_srt(original_segments: list, translated_text: str, outpu
             })
 
     return generate_srt(translated_segments, output_name)
+
+
+def split_segment_for_subtitles(segment: dict, max_chars: int = 45) -> list:
+    text = segment["text"].strip()
+    start = segment["start"]
+    end = segment["end"]
+
+    if len(text) <= max_chars:
+        return [segment]
+
+    words = text.split()
+    chunks = []
+    current = ""
+
+    for word in words:
+        if len(current) + len(word) + 1 <= max_chars:
+            current = f"{current} {word}".strip()
+        else:
+            chunks.append(current)
+            current = word
+
+    if current:
+        chunks.append(current)
+
+    duration = end - start
+    chunk_duration = duration / len(chunks)
+
+    split_segments = []
+
+    for index, chunk in enumerate(chunks):
+        split_segments.append({
+            "start": start + index * chunk_duration,
+            "end": start + (index + 1) * chunk_duration,
+            "text": chunk
+        })
+
+    return split_segments
+
+
+def split_segments_for_subtitles(segments: list, max_chars: int = 45) -> list:
+    final_segments = []
+
+    for segment in segments:
+        final_segments.extend(
+            split_segment_for_subtitles(segment, max_chars)
+        )
+
+    return final_segments
