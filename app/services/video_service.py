@@ -8,7 +8,18 @@ VIDEO_OUTPUT_DIR = os.path.join("storage", "video_output")
 os.makedirs(VIDEO_OUTPUT_DIR, exist_ok=True)
 
 
-def merge_audio_with_video(video_path: str, audio_path: str) -> str:
+def _format_subtitle_path_for_ffmpeg(subtitle_path: str) -> str:
+    absolute_path = os.path.abspath(subtitle_path)
+    formatted_path = absolute_path.replace("\\", "/")
+    formatted_path = formatted_path.replace(":", "\\:")
+    return formatted_path
+
+
+def merge_audio_with_video(
+    video_path: str,
+    audio_path: str,
+    subtitle_path: str | None = None
+) -> str:
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
     output_video_path = os.path.join(
@@ -23,10 +34,33 @@ def merge_audio_with_video(video_path: str, audio_path: str) -> str:
         "-i", audio_path,
         "-map", "0:v:0",
         "-map", "1:a:0",
-        "-c:v", "copy",
+    ]
+
+    if subtitle_path:
+        formatted_subtitle_path = _format_subtitle_path_for_ffmpeg(
+            subtitle_path)
+        command.extend([
+            "-vf",
+            f"subtitles='{formatted_subtitle_path}'",
+            "-c:v",
+            "libx264",
+            "-preset",
+            "fast",
+            "-crf",
+            "23",
+        ])
+    else:
+        command.extend([
+            "-c:v",
+            "copy",
+        ])
+
+    command.extend([
+        "-c:a",
+        "aac",
         "-shortest",
         output_video_path
-    ]
+    ])
 
     result = subprocess.run(
         command,

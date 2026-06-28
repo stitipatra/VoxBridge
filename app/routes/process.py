@@ -86,7 +86,8 @@ def process_speech_input(
     if input_type == "video":
         translated_video_path = merge_audio_with_video(
             input_path,
-            translated_audio_path
+            translated_audio_path,
+            translated_subtitle_path
         )
 
     return {
