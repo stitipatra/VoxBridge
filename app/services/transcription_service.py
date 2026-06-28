@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 
-from app.ai.model_manager import get_whisper_model
+from app.ai.whisper_manager import get_whisper_model
 
 TRANSCRIPT_DIR = os.path.join("storage", "transcripts")
 os.makedirs(TRANSCRIPT_DIR, exist_ok=True)

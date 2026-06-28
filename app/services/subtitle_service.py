@@ -34,3 +34,23 @@ def generate_srt(segments: list, output_name: str = "subtitles") -> str:
             file.write(f"{text}\n\n")
 
     return subtitle_path
+
+
+def generate_translated_srt(original_segments: list, translated_text: str, output_name: str = "translated_subtitles") -> str:
+    translated_segments = []
+
+    if len(original_segments) == 1:
+        translated_segments.append({
+            "start": original_segments[0]["start"],
+            "end": original_segments[0]["end"],
+            "text": translated_text
+        })
+    else:
+        for segment in original_segments:
+            translated_segments.append({
+                "start": segment["start"],
+                "end": segment["end"],
+                "text": translated_text
+            })
+
+    return generate_srt(translated_segments, output_name)
