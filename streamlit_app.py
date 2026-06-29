@@ -478,7 +478,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-info_left, info_right = st.columns(2)
+info_left, info_right = st.columns([0.42, 0.58])
 
 with info_left:
     st.markdown(
