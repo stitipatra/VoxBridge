@@ -53,6 +53,12 @@ st.set_page_config(
     layout="wide"
 )
 
+if "last_result" not in st.session_state:
+    st.session_state.last_result = None
+
+if "last_uploaded_file_name" not in st.session_state:
+    st.session_state.last_uploaded_file_name = None
+
 st.markdown(
     """
     <style>
@@ -182,6 +188,15 @@ section.main{
         height: 48px !important;
         font-weight: 800 !important;
     }
+    
+    [data-testid="stFormSubmitButton"] button {
+    background: linear-gradient(90deg, #38bdf8, #6366f1) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 14px !important;
+    height: 48px !important;
+    font-weight: 800 !important;
+}
 
     .stDownloadButton button {
         background: rgba(15, 23, 42, 0.95) !important;
@@ -368,19 +383,12 @@ div[role="option"]:hover{
 }
 
 .info-card{
-
     background:rgba(15,23,42,.78);
-
     border:1px solid rgba(56,189,248,.25);
-
     border-radius:22px;
-
-    padding:22px;
-
-    min-height:220px;
-
+    padding:22px 22px 14px 22px;
+    min-height:unset;
     box-shadow:0 10px 30px rgba(0,0,0,.22);
-
 }
 
 .info-title{
@@ -395,16 +403,48 @@ div[role="option"]:hover{
 
 }
 
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 32px;
+}
+
 .info-item{
-
     font-size:17px;
-
     color:#dbeafe!important;
-
     margin:10px 0;
-
     font-weight:600;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
 
+
+[data-testid="stVerticalBlockBorderWrapper"]{
+    border:none !important;
+    box-shadow:none !important;
+    background:transparent !important;
+    border-radius:0 !important;
+    padding:0 !important;
+    margin:0 !important;
+    min-height:0 !important;
+    height:0 !important;
+    overflow:hidden !important;
+}
+
+[data-testid="stForm"] {
+    border:none !important;
+    box-shadow:none !important;
+    background:transparent !important;
+    padding:0 !important;
+}
+
+[data-testid="stHorizontalBlock"] > [data-testid="stVerticalBlock"] {
+    background: rgba(15, 23, 42, 0.78);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 24px;
+    padding: 26px;
+    box-shadow: 0 18px 60px rgba(0,0,0,0.32);
 }
 
     </style>
@@ -444,215 +484,224 @@ with info_left:
     st.markdown(
         """<div class="info-card">
 <div class="info-title">🧠 AI Stack</div>
-<div class="info-item">🎙️  Faster-Whisper</div>
-<div class="info-item">🌐 NLLB-200</div>
-<div class="info-item">🔊 eSpeak-NG</div>
-<div class="info-item">🎬 FFmpeg</div>
-</div>""",
-        unsafe_allow_html=True)
+<div class="info-grid">
+  <div class="info-item">🎙️ Faster-Whisper</div>
+  <div class="info-item">🌐 NLLB-200</div>
+  <div class="info-item">🔊 eSpeak-NG</div>
+  <div class="info-item">🎬 FFmpeg</div>
+</div>
+</div>""", unsafe_allow_html=True)
 
 with info_right:
     st.markdown(
         """<div class="info-card">
 <div class="info-title">🚀 Why VoxBridge?</div>
-<div class="info-item"> 🔒  Fully Offline</div>
-<div class="info-item">⚡ Privacy First</div>
-<div class="info-item">🌍 Text • Audio • Video</div>
-<div class="info-item">📝 Speech • Voice • Subtitles</div>
-</div>""",
-        unsafe_allow_html=True)
+<div class="info-grid">
+  <div class="info-item">🔒 Fully Offline</div>
+  <div class="info-item">⚡ Privacy First</div>
+  <div class="info-item">🌍 Text • Audio • Video</div>
+  <div class="info-item">📝 Speech • Voice • Subtitles</div>
+</div>
+</div>""", unsafe_allow_html=True)
 
 left, right = st.columns([0.8, 1.2], gap="large")
 
 with left:
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    # st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.markdown("## ⚙️ Configure Translation")
 
-    uploaded_file = st.file_uploader(
-        "Upload video, audio, or text",
-        type=["mp4", "mov", "mkv", "avi", "mp3",
-              "wav", "m4a", "aac", "flac", "txt"]
-    )
+    with st.form("process_form"):
 
-    source_language = st.selectbox(
-        "Source Language",
-        ["auto", "en", "hi", "mr"],
-        format_func=lambda x: {
-            "auto": "Auto Detect",
-            "en": "English",
-            "hi": "Hindi",
-            "mr": "Marathi"
-        }[x]
-    )
+        uploaded_file = st.file_uploader(
+            "Upload video, audio, or text",
+            type=["mp4", "mov", "mkv", "avi",
+                  "mp3", "wav", "m4a",
+                  "aac", "flac", "txt"]
+        )
 
-    target_language = st.selectbox(
-        "Target Language",
-        ["en", "hi", "mr"],
-        format_func=lambda x: {
-            "en": "English",
-            "hi": "Hindi",
-            "mr": "Marathi"
-        }[x]
-    )
+        source_language = st.selectbox(
+            "Source Language",
+            ["auto", "en", "hi", "mr"],
+            format_func=lambda x: {
+                "auto": "Auto Detect",
+                "en": "English",
+                "hi": "Hindi",
+                "mr": "Marathi"
+            }[x]
+        )
 
-    voice_gender = st.radio(
-        "Voice",
-        ["male", "female"],
-        horizontal=True
-    )
+        target_language = st.selectbox(
+            "Target Language",
+            ["en", "hi", "mr"],
+            format_func=lambda x: {
+                "en": "English",
+                "hi": "Hindi",
+                "mr": "Marathi"
+            }[x]
+        )
 
-    process_clicked = st.button("Translate Now 🚀", use_container_width=True)
+        voice_gender = st.radio(
+            "Voice",
+            ["male", "female"],
+            horizontal=True
+        )
+
+        process_clicked = st.form_submit_button(
+            "Translate Now 🚀",
+            use_container_width=True
+        )
 
     st.markdown("</div>", unsafe_allow_html=True)
 
 with right:
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    # st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.markdown("## 📊 Processing Results")
 
-    if not process_clicked:
+    if not process_clicked and st.session_state.last_result is None:
         st.info("Upload a file and click Translate Now.")
         st.markdown("</div>", unsafe_allow_html=True)
         st.stop()
 
-    if uploaded_file is None:
+    if process_clicked and uploaded_file is None:
         st.error("Please upload a file first.")
         st.markdown("</div>", unsafe_allow_html=True)
         st.stop()
 
-    try:
-        input_type = detect_input_type(uploaded_file.name)
-        input_path = save_uploaded_file(uploaded_file, input_type)
+    if process_clicked:
+        try:
+            input_type = detect_input_type(uploaded_file.name)
+            input_path = save_uploaded_file(uploaded_file, input_type)
 
-        request = ProcessRequest(
-            input_type=input_type,
-            input_path=input_path,
-            source_language=source_language,
-            target_language=target_language,
-            voice_gender=voice_gender
-        )
-
-        loader_placeholder = st.empty()
-
-        loader_placeholder.markdown(
-            """
-            <div class="loader-card">
-                <div class="orb-loader"></div>
-                <div class="processing-title">VoxBridge is working its magic</div>
-                <div class="processing-subtitle">
-                    Transcribing speech · Translating text · Generating subtitles · Creating voice · Rendering video
-                </div>
-                <div class="pipeline-dots">
-                    <span></span><span></span><span></span><span></span><span></span>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-        progress_bar = st.progress(0)
-        progress_text = st.empty()
-
-        steps = [
-            (10, "📥 Upload saved"),
-            (25, "🎙️ Transcribing speech"),
-            (45, "🌍 Translating content"),
-            (65, "📝 Generating subtitles"),
-            (82, "🔊 Creating translated speech"),
-            (95, "🎬 Rendering final output"),
-        ]
-
-        for progress, label in steps:
-            progress_bar.progress(progress)
-            progress_text.markdown(f"**{label}**")
-            time.sleep(0.25)
-
-        result = process_file(request)
-
-        progress_bar.progress(100)
-        progress_text.markdown("**✅ Processing complete**")
-        time.sleep(0.4)
-
-        loader_placeholder.empty()
-        progress_bar.empty()
-        progress_text.empty()
-
-        st.markdown(
-            '<div class="success-box">✅ Done! VoxBridge processed your file successfully.</div>', unsafe_allow_html=True)
-
-        m1, m2, m3, m4 = st.columns(4)
-        with m1:
-            st.markdown(
-                f'<div class="mini-card"><div class="mini-label">Input</div><div class="mini-value">{result.get("input_type", "-")}</div></div>', unsafe_allow_html=True)
-        with m2:
-            st.markdown(
-                f'<div class="mini-card"><div class="mini-label">Detected</div><div class="mini-value">{result.get("detected_language", "N/A")}</div></div>', unsafe_allow_html=True)
-        with m3:
-            st.markdown(
-                f'<div class="mini-card"><div class="mini-label">Target</div><div class="mini-value">{result.get("target_language", "-")}</div></div>', unsafe_allow_html=True)
-        with m4:
-            st.markdown(
-                f'<div class="mini-card"><div class="mini-label">Voice</div><div class="mini-value">{voice_gender}</div></div>', unsafe_allow_html=True)
-
-        translated_video = result.get("translated_video_path")
-        translated_audio = result.get("translated_audio_path")
-
-        if translated_video and os.path.exists(translated_video):
-            st.markdown(
-                '<div class="section-title">Final Translated Video</div>', unsafe_allow_html=True)
-            st.video(translated_video)
-
-        if translated_audio and os.path.exists(translated_audio):
-            st.markdown(
-                '<div class="section-title">Translated Audio</div>', unsafe_allow_html=True)
-            st.audio(translated_audio)
-
-        st.markdown(
-            '<div class="section-title">Transcript & Translation</div>', unsafe_allow_html=True)
-        t1, t2 = st.columns(2)
-        with t1:
-            st.text_area(
-                "Original",
-                value=result.get("transcript_text") or result.get(
-                    "original_text") or "",
-                height=190
-            )
-        with t2:
-            st.text_area(
-                "Translated",
-                value=result.get("translated_text", ""),
-                height=190
+            request = ProcessRequest(
+                input_type=input_type,
+                input_path=input_path,
+                source_language=source_language,
+                target_language=target_language,
+                voice_gender=voice_gender
             )
 
-        st.markdown('<div class="section-title">Download Outputs</div>',
-                    unsafe_allow_html=True)
+            loader_placeholder = st.empty()
+            progress_bar = st.progress(0)
+            progress_text = st.empty()
 
-        d1, d2, d3 = st.columns(3)
+            try:
+                loader_placeholder.markdown(
+                    """<div class="loader-card">
+                       <div class="orb-loader"></div>
+                       <div class="processing-title">VoxBridge is working its magic</div>
+                       <div class="processing-subtitle">Transcribing speech · Translating text · Generating subtitles · Creating voice · Rendering video</div>
+                       <div class="pipeline-dots"><span></span><span></span><span></span><span></span><span></span></div>
+                       </div>""",
+                    unsafe_allow_html=True
+                )
 
-        with d1:
-            st.markdown("##### 🎬 Media")
-            download_button("🎥 Final Video", result.get(
-                "translated_video_path"), "video/mp4")
-            download_button("🔊 Translated Audio", result.get(
-                "translated_audio_path"), "audio/wav")
+                steps = [
+                    (10, "📥 Upload saved"),
+                    (25, "🎙️ Transcribing speech"),
+                    (45, "🌍 Translating content"),
+                    (65, "📝 Generating subtitles"),
+                    (82, "🔊 Creating translated speech"),
+                    (95, "🎬 Rendering final output"),
+                ]
 
-        with d2:
-            st.markdown("##### 📄 Text")
-            download_button("📄 Transcript", result.get(
-                "transcript_path"), "text/plain")
-            download_button("🌍 Translation", result.get(
-                "translated_text_path"), "text/plain")
+                for progress, label in steps:
+                    progress_bar.progress(progress)
+                    progress_text.markdown(f"**{label}**")
+                    time.sleep(0.6)
 
-        with d3:
-            st.markdown("##### 💬 Subtitles")
-            download_button("📝 Original SRT", result.get(
-                "original_subtitle_path"), "text/plain")
-            download_button("📝 Translated SRT", result.get(
-                "translated_subtitle_path"), "text/plain")
+                result = process_file(request)
+                st.session_state.last_result = result
+                st.session_state.last_voice_gender = voice_gender
+                st.session_state.last_uploaded_file_name = uploaded_file.name
 
-        with st.expander("Debug JSON"):
-            st.json(result)
+                progress_bar.progress(100)
+                progress_text.markdown("**✅ Processing complete**")
+                time.sleep(0.4)
 
-    except Exception as e:
-        st.error(str(e))
+            finally:
+                loader_placeholder.empty()
+                progress_bar.empty()
+                progress_text.empty()
+
+        except Exception as e:
+            st.error(str(e))
+            st.markdown("</div>", unsafe_allow_html=True)
+            st.stop()
+
+    # Always read from session_state — never re-process
+    result = st.session_state.last_result
+    display_voice = st.session_state.get("last_voice_gender", "-")
+
+    st.markdown('<div class="success-box">✅ Done! VoxBridge processed your file successfully.</div>',
+                unsafe_allow_html=True)
+
+    lang_map = {"en": "English", "hi": "Hindi",
+                "mr": "Marathi", "auto": "Auto"}
+    m1, m2, m3, m4 = st.columns(4)
+    with m1:
+        st.markdown(
+            f'<div class="mini-card"><div class="mini-label">Input</div><div class="mini-value">{result.get("input_type", "-")}</div></div>', unsafe_allow_html=True)
+    with m2:
+        detected = lang_map.get(result.get(
+            "detected_language", ""), result.get("detected_language", "N/A"))
+        st.markdown(
+            f'<div class="mini-card"><div class="mini-label">Detected</div><div class="mini-value">{detected}</div></div>', unsafe_allow_html=True)
+    with m3:
+        target = lang_map.get(result.get("target_language", ""),
+                              result.get("target_language", "-"))
+        st.markdown(
+            f'<div class="mini-card"><div class="mini-label">Target</div><div class="mini-value">{target}</div></div>', unsafe_allow_html=True)
+    with m4:
+        st.markdown(
+            f'<div class="mini-card"><div class="mini-label">Voice</div><div class="mini-value">{display_voice}</div></div>', unsafe_allow_html=True)
+
+    translated_video = result.get("translated_video_path")
+    translated_audio = result.get("translated_audio_path")
+
+    if translated_video and os.path.exists(translated_video):
+        st.markdown(
+            '<div class="section-title">Final Translated Video</div>', unsafe_allow_html=True)
+        st.video(translated_video)
+
+    if translated_audio and os.path.exists(translated_audio):
+        st.markdown(
+            '<div class="section-title">Translated Audio</div>', unsafe_allow_html=True)
+        st.audio(translated_audio)
+
+    st.markdown('<div class="section-title">Transcript & Translation</div>',
+                unsafe_allow_html=True)
+    t1, t2 = st.columns(2)
+    with t1:
+        st.text_area("Original", value=result.get("transcript_text")
+                     or result.get("original_text") or "", height=190)
+    with t2:
+        st.text_area("Translated", value=result.get(
+            "translated_text", ""), height=190)
+
+    st.markdown('<div class="section-title">Download Outputs</div>',
+                unsafe_allow_html=True)
+
+    d1, d2, d3 = st.columns(3)
+    with d1:
+        st.markdown("##### 🎬 Media")
+        download_button("🎥 Final Video", result.get(
+            "translated_video_path"), "video/mp4")
+        download_button("🔊 Translated Audio", result.get(
+            "translated_audio_path"), "audio/wav")
+    with d2:
+        st.markdown("##### 📄 Text")
+        download_button("📄 Transcript", result.get(
+            "transcript_path"), "text/plain")
+        download_button("🌍 Translation", result.get(
+            "translated_text_path"), "text/plain")
+    with d3:
+        st.markdown("##### 💬 Subtitles")
+        download_button("📝 Original SRT", result.get(
+            "original_subtitle_path"), "text/plain")
+        download_button("📝 Translated SRT", result.get(
+            "translated_subtitle_path"), "text/plain")
+
+    with st.expander("Debug JSON"):
+        st.json(result)
 
     st.markdown("</div>", unsafe_allow_html=True)
