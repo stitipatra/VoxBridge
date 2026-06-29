@@ -2,25 +2,25 @@
 
 > **Offline Multilingual Translation for Text, Audio, and Video with AI-generated Speech & Subtitles**
 
-VoxBridge is an end-to-end offline translation system that translates **text, audio, and video** between multiple languages while preserving accessibility through **speech synthesis** and **subtitle generation**. Unlike cloud-based translators, VoxBridge performs the complete pipeline locally without requiring internet connectivity or external APIs.
+VoxBridge is an end-to-end offline AI-powered translation system that translates **text, audio, and video** into multiple languages while preserving accessibility through **speech synthesis** and **subtitle generation**. All processing is performed locally without requiring cloud services or API keys.
 
 ---
 
-## ✨ Features
+# Features
 
 * 🌍 Offline multilingual translation
-* 🎥 Video translation with burned-in subtitles
+* 🎥 Video translation with embedded subtitles
 * 🎵 Audio translation with AI-generated speech
 * 📄 Text translation with speech generation
 * 📝 Automatic subtitle (.srt) generation
 * 🎙️ Automatic speech recognition
 * 🔊 Male/Female voice selection
-* 🚀 Fully local processing (No API Keys)
-* 🔒 Privacy-first architecture
+* 🔒 Privacy-first local processing
+* 🚀 No internet or API keys required
 
 ---
 
-## Supported Languages
+# Supported Languages
 
 | Language | Code |
 | -------- | ---- |
@@ -30,39 +30,38 @@ VoxBridge is an end-to-end offline translation system that translates **text, au
 
 ---
 
-## AI Stack
+# Technology Stack
 
-| Component           | Technology     |
-| ------------------- | -------------- |
-| Speech Recognition  | Faster-Whisper |
-| Machine Translation | NLLB-200       |
-| Speech Synthesis    | eSpeak NG      |
-| Video Processing    | FFmpeg         |
-| Backend             | FastAPI        |
-| Frontend            | Streamlit      |
+| Module               | Technology     |
+| -------------------- | -------------- |
+| Speech Recognition   | Faster-Whisper |
+| Translation          | NLLB-200       |
+| Speech Synthesis     | eSpeak NG      |
+| Video Processing     | FFmpeg         |
+| Backend Architecture | FastAPI        |
+| User Interface       | Streamlit      |
 
 ---
 
-## Processing Pipeline
+# Processing Pipeline
 
-```
-Input
-(Text / Audio / Video)
+```text
+Input (Text / Audio / Video)
         │
         ▼
-Speech Recognition (Whisper)
+Speech Recognition (Faster-Whisper)
         │
         ▼
 Language Detection
         │
         ▼
-Translation (NLLB)
+Translation (NLLB-200)
         │
         ▼
 Subtitle Generation
         │
         ▼
-Speech Generation
+Speech Synthesis (eSpeak NG)
         │
         ▼
 Video Rendering (FFmpeg)
@@ -73,23 +72,20 @@ Translated Output
 
 ---
 
-## Project Structure
+# Project Structure
 
-```
+```text
 VoxBridge
 │
 ├── app/
 │   ├── ai/
-│   ├── models/
 │   ├── routes/
 │   ├── services/
 │   ├── config.py
 │   └── main.py
 │
 ├── models/
-│
 ├── storage/
-│
 ├── tools/
 │   ├── espeak/
 │   └── ffmpeg/
@@ -101,7 +97,7 @@ VoxBridge
 
 ---
 
-## Installation
+# Installation
 
 Clone the repository
 
@@ -129,112 +125,110 @@ pip install -r requirements.txt
 
 ---
 
-## Running the Backend
+# Running VoxBridge
 
-```bash
-uvicorn app.main:app --reload
-```
-
-Backend runs at
-
-```
-http://127.0.0.1:8000
-```
-
----
-
-## Running the Frontend
-
-In another terminal
+Launch the application
 
 ```bash
 streamlit run streamlit_app.py
 ```
 
-Frontend opens automatically at
-
-```
-http://localhost:8501
-```
+The Streamlit interface will open automatically in your browser.
 
 ---
 
-## Supported Inputs
+# Architecture
+
+Although the project is structured using **FastAPI** modules, the Streamlit frontend directly invokes the backend processing functions. This keeps deployment simple while maintaining a clean and modular architecture.
+
+The processing pipeline is:
+
+```text
+Streamlit UI
+      │
+      ▼
+process_file()
+      │
+      ▼
+Transcription Service
+      │
+      ▼
+Translation Service
+      │
+      ▼
+TTS Service
+      │
+      ▼
+Video Service
+      │
+      ▼
+Output Files
+```
+
+The FastAPI application is retained to support future REST API integration without changing the processing logic.
+
+---
+
+# Supported Inputs
 
 ### Text
 
-```
-.txt
-```
+* `.txt`
 
 ### Audio
 
-```
-.mp3
-.wav
-.m4a
-.aac
-.flac
-```
+* `.mp3`
+* `.wav`
+* `.m4a`
+* `.aac`
+* `.flac`
 
 ### Video
 
-```
-.mp4
-.mov
-.mkv
-.avi
-```
+* `.mp4`
+* `.mov`
+* `.mkv`
+* `.avi`
 
 ---
 
-## Outputs
+# Generated Outputs
 
-Depending on the input type, VoxBridge generates:
+Depending on the input type, VoxBridge produces:
 
-* Translated Text
-* AI-generated Speech (.wav)
-* Original Transcript
-* Original Subtitles (.srt)
-* Translated Subtitles (.srt)
-* Final Translated Video (.mp4)
+* 📄 Translated Text
+* 🎙️ Transcript
+* 🌍 Translation
+* 🔊 AI-generated Speech
+* 📝 Original Subtitles (.srt)
+* 📝 Translated Subtitles (.srt)
+* 🎥 Final Translated Video
 
 ---
 
-## Highlights
+# Highlights
 
-* ✅ 100% Offline
-* ✅ No Cloud APIs
+* ✅ Fully Offline
+* ✅ Privacy First
 * ✅ No API Keys
-* ✅ Privacy Focused
 * ✅ Local AI Processing
+* ✅ Cross-format Translation
+* ✅ Automatic Subtitle Generation
 
 ---
 
-## Demo Workflow
-
-1. Upload a Text, Audio, or Video file.
-2. Select source language (or Auto Detect).
-3. Select target language.
-4. Choose Male or Female voice.
-5. Click **Translate Now**.
-6. Download translated outputs.
-
----
-
-## Future Enhancements
+# Future Enhancements
 
 * Additional language support
 * Neural TTS voices
 * Speaker diarization
-* Lip-sync preservation
-* GPU acceleration
-* Batch processing
-* Real-time streaming translation
+* Batch translation
+* GPU optimization
+* Real-time translation
 
 ---
 
-## Authors
+# Author
 
 **Stitiprangya Patra**
 
@@ -242,6 +236,6 @@ BITS Pilani Goa Campus
 
 ---
 
-## License
+# License
 
 This project is intended for educational and research purposes.
