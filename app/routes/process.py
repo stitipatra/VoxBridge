@@ -5,9 +5,9 @@ from app.services.translation_service import translate_text
 from app.services.output_service import save_text_output
 from app.services.media_service import extract_audio_from_video, convert_audio_to_wav
 from app.services.transcription_service import transcribe_audio
-from app.services.subtitle_service import generate_srt, split_segments_for_subtitles
+from app.services.subtitle_service import generate_srt, split_segments_for_subtitles, generate_ass
 from app.services.tts_service import generate_speech
-from app.services.video_service import merge_audio_with_video
+from app.services.video_service import merge_audio_with_video, get_video_dimensions
 
 router = APIRouter(prefix="/process", tags=["Process"])
 
@@ -103,14 +103,33 @@ def process_speech_input(
         target_language
     )
 
+    subtitle_max_chars = {
+        "en": 28,
+        "hi": 30,
+        "mr": 30
+    }
+
     translated_segments = split_segments_for_subtitles(
         translated_segments,
-        max_chars=45
+        max_chars=subtitle_max_chars.get(target_language, 45)
     )
 
-    translated_subtitle_path = generate_srt(
+    '''translated_subtitle_path = generate_srt(
         translated_segments,
         translated_subtitle_name
+    )'''
+
+    if input_type == "video":
+        video_width, video_height = get_video_dimensions(input_path)
+
+    else:
+        video_width, video_height = 1280, 720
+
+    translated_subtitle_path = generate_ass(
+        translated_segments,
+        translated_subtitle_name,
+        video_width,
+        video_height
     )
 
     translated_audio_path = generate_speech(

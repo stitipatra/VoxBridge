@@ -2,17 +2,43 @@ import os
 import subprocess
 from datetime import datetime
 
-from app.config import FFMPEG_PATH
+from app.config import FFMPEG_PATH, FFPROBE_PATH
 
 VIDEO_OUTPUT_DIR = os.path.join("storage", "video_output")
+FONTS_DIR = os.path.join("tools", "fonts")
+
 os.makedirs(VIDEO_OUTPUT_DIR, exist_ok=True)
 
 
-def _format_subtitle_path_for_ffmpeg(subtitle_path: str) -> str:
-    absolute_path = os.path.abspath(subtitle_path)
+def _format_path_for_ffmpeg(path: str) -> str:
+    absolute_path = os.path.abspath(path)
     formatted_path = absolute_path.replace("\\", "/")
     formatted_path = formatted_path.replace(":", "\\:")
     return formatted_path
+
+
+def get_video_dimensions(video_path: str) -> tuple[int, int]:
+    command = [
+        FFPROBE_PATH,
+        "-v", "error",
+        "-select_streams", "v:0",
+        "-show_entries", "stream=width,height",
+        "-of", "csv=p=0",
+        video_path
+    ]
+
+    result = subprocess.run(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
+    )
+
+    if result.returncode != 0:
+        raise RuntimeError(result.stderr)
+
+    width, height = result.stdout.strip().split(",")
+    return int(width), int(height)
 
 
 def merge_audio_with_video(
@@ -37,11 +63,17 @@ def merge_audio_with_video(
     ]
 
     if subtitle_path:
-        formatted_subtitle_path = _format_subtitle_path_for_ffmpeg(
-            subtitle_path)
+        formatted_subtitle_path = _format_path_for_ffmpeg(subtitle_path)
+        formatted_fonts_dir = _format_path_for_ffmpeg(FONTS_DIR)
+
+        subtitle_filter = (
+            f"ass='{formatted_subtitle_path}'"
+            f":fontsdir='{formatted_fonts_dir}'"
+        )
+
         command.extend([
             "-vf",
-            f"subtitles='{formatted_subtitle_path}'",
+            subtitle_filter,
             "-c:v",
             "libx264",
             "-preset",
@@ -58,7 +90,6 @@ def merge_audio_with_video(
     command.extend([
         "-c:a",
         "aac",
-        "-shortest",
         output_video_path
     ])
 
