@@ -8,3 +8,14 @@ storage/*
 .env
 .idea/
 .vscode/
+
+*.mp4
+*.wav
+*.srt
+*.ass
+hindi_test.txt
+marathi_test.txt
+test_piper.py
+test_piper.bat
+tools/ffmpeg/doc/
+tools/ffmpeg/presets/
