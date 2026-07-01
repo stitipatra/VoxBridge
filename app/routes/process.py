@@ -49,6 +49,46 @@ def translate_segments(
     return translated_segments
 
 
+def create_subtitle_segments_from_translated_text(
+    translated_text: str,
+    duration: float,
+    max_chars: int
+) -> list:
+    words = translated_text.strip().split()
+
+    if not words:
+        return []
+
+    chunks = []
+    current_chunk = ""
+
+    for word in words:
+        next_chunk = f"{current_chunk} {word}".strip()
+
+        if len(next_chunk) <= max_chars:
+            current_chunk = next_chunk
+        else:
+            if current_chunk:
+                chunks.append(current_chunk)
+            current_chunk = word
+
+    if current_chunk:
+        chunks.append(current_chunk)
+
+    chunk_duration = duration / len(chunks)
+
+    subtitle_segments = []
+
+    for index, chunk in enumerate(chunks):
+        subtitle_segments.append({
+            "start": index * chunk_duration,
+            "end": (index + 1) * chunk_duration,
+            "text": chunk
+        })
+
+    return subtitle_segments
+
+
 def process_speech_input(
     input_type: str,
     input_path: str,
@@ -105,13 +145,14 @@ def process_speech_input(
 
     subtitle_max_chars = {
         "en": 28,
-        "hi": 30,
-        "mr": 30
+        "hi": 22,
+        "mr": 22
     }
 
-    translated_segments = split_segments_for_subtitles(
-        translated_segments,
-        max_chars=subtitle_max_chars.get(target_language, 45)
+    translated_segments = create_subtitle_segments_from_translated_text(
+        translated_text,
+        transcription_result["duration"],
+        subtitle_max_chars.get(target_language, 28)
     )
 
     '''translated_subtitle_path = generate_srt(
