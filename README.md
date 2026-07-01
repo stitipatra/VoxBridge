@@ -6,6 +6,12 @@ VoxBridge is an end-to-end offline AI-powered translation system that translates
 
 ---
 
+## Demo
+
+![VoxBridge Demo](walkthrough/demo.gif)
+
+---
+
 # Features
 
 - 🌍 Offline multilingual translation
