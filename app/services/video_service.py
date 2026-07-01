@@ -89,8 +89,19 @@ def match_audio_duration(audio_path: str, target_duration: float) -> str:
 
     speed_factor = audio_duration / target_duration
 
+    # Already close enough.
     if 0.97 <= speed_factor <= 1.03:
         return audio_path
+
+    # Case 1: translated audio is shorter than video.
+    # Slow it down, but only up to 30% to avoid distorted slow-motion speech.
+    if audio_duration < target_duration:
+        speed_factor = max(speed_factor, 1 / 1.30)
+
+    # Case 2: translated audio is longer than video.
+    # Speed it up enough to fit inside the video duration.
+    else:
+        speed_factor = speed_factor
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     adjusted_audio_path = os.path.join(

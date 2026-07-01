@@ -8,15 +8,20 @@ VoxBridge is an end-to-end offline AI-powered translation system that translates
 
 # Features
 
-* 🌍 Offline multilingual translation
-* 🎥 Video translation with embedded subtitles
-* 🎵 Audio translation with AI-generated speech
-* 📄 Text translation with speech generation
-* 📝 Automatic subtitle (.srt) generation
-* 🎙️ Automatic speech recognition
-* 🔊 Male/Female voice selection
-* 🔒 Privacy-first local processing
-* 🚀 No internet or API keys required
+- 🌍 Offline multilingual translation
+- 🎥 Video translation with embedded subtitles
+- 🎵 Audio translation with AI-generated speech
+- 📄 Text translation with speech generation
+- 📝 Automatic subtitle (.srt) generation
+- 🎙️ Automatic speech recognition
+- 🔊 Male/Female voice selection
+- 🔒 Privacy-first local processing
+- 🚀 No internet or API keys required
+
+* 🖥️ Fully Offline AI Inference
+* 📱 Portrait & Landscape Subtitle Support
+* 🎨 Dynamic ASS Subtitle Rendering
+* 📦 Supports media uploads up to 2 GB
 
 ---
 
@@ -69,6 +74,40 @@ Video Rendering (FFmpeg)
         ▼
 Translated Output
 ```
+
+---
+
+# Design Decisions
+
+VoxBridge prioritizes **translation quality**, **offline execution**, and **subtitle consistency** over aggressive parallel processing.
+
+### Full-Context Translation
+
+Instead of translating each Whisper segment independently, VoxBridge first generates a complete transcript and translates it as a single document.
+
+This approach:
+
+- Produces more natural translations.
+- Preserves sentence-level context.
+- Ensures the translated text shown in the UI exactly matches the embedded subtitles.
+- Simplifies debugging and deterministic processing.
+
+### Audio Synchronization
+
+Languages differ in speaking speed and sentence structure.
+
+To preserve speech quality:
+
+- Small duration differences are automatically corrected.
+- Large differences are adjusted only within a safe playback-speed boundary.
+- Excessive slow-motion speech is intentionally avoided.
+- Video duration is always preserved and subtitles continue throughout the entire video.
+
+### Offline First
+
+The complete pipeline runs locally using Faster-Whisper, NLLB-200, eSpeak NG and FFmpeg.
+
+No cloud APIs, internet connection, or API keys are required after setup.
 
 ---
 
@@ -169,26 +208,43 @@ The FastAPI application is retained to support future REST API integration witho
 
 ---
 
+# Scalability
+
+Although the current implementation processes media using a single translation pipeline, the architecture has been intentionally designed to support future scaling.
+
+Potential enhancements include:
+
+- Chunk-based transcription for long videos
+- Parallel Whisper inference
+- Queue-based worker processing
+- GPU-backed batch inference
+- Segment-level TTS alignment
+- Distributed media storage
+- REST API deployment using FastAPI
+- Real-time progress tracking
+
+---
+
 # Supported Inputs
 
 ### Text
 
-* `.txt`
+- `.txt`
 
 ### Audio
 
-* `.mp3`
-* `.wav`
-* `.m4a`
-* `.aac`
-* `.flac`
+- `.mp3`
+- `.wav`
+- `.m4a`
+- `.aac`
+- `.flac`
 
 ### Video
 
-* `.mp4`
-* `.mov`
-* `.mkv`
-* `.avi`
+- `.mp4`
+- `.mov`
+- `.mkv`
+- `.avi`
 
 ---
 
@@ -196,35 +252,79 @@ The FastAPI application is retained to support future REST API integration witho
 
 Depending on the input type, VoxBridge produces:
 
-* 📄 Translated Text
-* 🎙️ Transcript
-* 🌍 Translation
-* 🔊 AI-generated Speech
-* 📝 Original Subtitles (.srt)
-* 📝 Translated Subtitles (.srt)
-* 🎥 Final Translated Video
+- 📄 Translated Text
+- 🎙️ Transcript
+- 🌍 Translation
+- 🔊 AI-generated Speech
+- 📝 Original Subtitles (.srt)
+- 📝 Translated Subtitles (.srt)
+- 🎥 Final Translated Video
+
+---
+
+# Edge Cases Handled
+
+- GPU unavailable → automatic CPU fallback
+- Portrait and landscape subtitle rendering
+- Cross-platform bundled FFmpeg and eSpeak support
+- Large media uploads (up to 2 GB)
+- Multiple video and audio formats
+- Dynamic subtitle scaling
+- Automatic language detection
+- Graceful handling of unsupported files
 
 ---
 
 # Highlights
 
-* ✅ Fully Offline
-* ✅ Privacy First
-* ✅ No API Keys
-* ✅ Local AI Processing
-* ✅ Cross-format Translation
-* ✅ Automatic Subtitle Generation
+- ✅ Fully Offline
+- ✅ Privacy First
+- ✅ No API Keys
+- ✅ Local AI Processing
+- ✅ Cross-format Translation
+- ✅ Automatic Subtitle Generation
+
+---
+
+# Engineering Challenges & Solutions
+
+| Challenge                            | Solution                                                                      |
+| ------------------------------------ | ----------------------------------------------------------------------------- |
+| Incorrect Hindi subtitle rendering   | Migrated from SRT to ASS subtitles with bundled Noto Sans Devanagari font     |
+| Subtitle overflow on portrait videos | Dynamic font sizing, margins and language-specific wrapping                   |
+| Translation inconsistencies          | Adopted full-context translation instead of segment-wise translation          |
+| Audio/video duration mismatch        | Implemented bounded playback-speed adjustment while preserving speech quality |
+| Cross-platform deployment            | Bundled FFmpeg, fonts and eSpeak dependencies                                 |
+| Large file uploads                   | Increased Streamlit upload limit to support media files up to 2 GB            |
 
 ---
 
 # Future Enhancements
 
-* Additional language support
-* Neural TTS voices
-* Speaker diarization
-* Batch translation
-* GPU optimization
-* Real-time translation
+- Additional language support
+- Neural TTS voices (Piper / Coqui)
+- Segment-level TTS synchronization
+- Chunk-based transcription for very large videos
+- Parallel inference pipelines
+- Speaker diarization
+- Voice cloning
+- Lip-sync alignment
+- Batch translation
+- GPU optimization
+- REST API deployment
+- Real-time translation
+
+---
+
+# Performance Characteristics
+
+- Fully offline inference
+- Runtime API cost: **₹0 / $0**
+- Modular service-oriented architecture
+- Supports text, audio and video translation
+- Supports English, Hindi and Marathi
+- Upload size up to **2 GB**
+- Cross-platform compatible (Windows, macOS and Linux)
 
 ---
 
