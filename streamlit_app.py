@@ -48,8 +48,8 @@ def download_button(label: str, file_path: str, mime: str):
 
 
 st.set_page_config(
-    page_title="VoxBridge",
-    page_icon="🌉",
+    page_title="अनुवादिनी",
+    page_icon="🌍",
     layout="wide"
 )
 
@@ -456,7 +456,7 @@ st.markdown(
     """
 <div class="hero">
     <div class="hero-top">
-        <div class="hero-title">VoxBridge</div>
+        <div class="hero-title">अनुवादिनी</div>
         <div class="language-pills">
             <span class="pill">🌍 English</span>
             <span class="pill">🇮🇳 Hindi</span>
@@ -495,7 +495,7 @@ with info_left:
 with info_right:
     st.markdown(
         """<div class="info-card">
-<div class="info-title">🚀 Why VoxBridge?</div>
+<div class="info-title">🚀 Why अनुवादिनी?</div>
 <div class="info-grid">
   <div class="info-item">🔒 Fully Offline</div>
   <div class="info-item">⚡ Privacy First</div>
@@ -588,7 +588,7 @@ with right:
                 loader_placeholder.markdown(
                     """<div class="loader-card">
                        <div class="orb-loader"></div>
-                       <div class="processing-title">VoxBridge is working its magic</div>
+                       <div class="processing-title">अनुवादिनी is working its magic</div>
                        <div class="processing-subtitle">Transcribing speech · Translating text · Generating subtitles · Creating voice · Rendering video</div>
                        <div class="pipeline-dots"><span></span><span></span><span></span><span></span><span></span></div>
                        </div>""",
@@ -632,7 +632,7 @@ with right:
     result = st.session_state.last_result
     display_voice = st.session_state.get("last_voice_gender", "-")
 
-    st.markdown('<div class="success-box">✅ Done! VoxBridge processed your file successfully.</div>',
+    st.markdown('<div class="success-box">✅ Done! अनुवादिनी processed your file successfully.</div>',
                 unsafe_allow_html=True)
 
     lang_map = {"en": "English", "hi": "Hindi",

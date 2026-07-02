@@ -159,7 +159,7 @@ def generate_ass(
         margin_lr = max(60, int(video_width * 0.07))
 
     ass_header = f"""[Script Info]
-Title: VoxBridge Subtitles
+Title: अनुवादिनी Subtitles
 ScriptType: v4.00+
 WrapStyle: 2
 ScaledBorderAndShadow: yes

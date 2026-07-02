@@ -1,14 +1,14 @@
-# VoxBridge
+# अनुवादिनी
 
 > **Offline Multilingual Translation for Text, Audio, and Video with AI-generated Speech & Subtitles**
 
-VoxBridge is an end-to-end offline AI-powered translation system that translates **text, audio, and video** into multiple languages while preserving accessibility through **speech synthesis** and **subtitle generation**. All processing is performed locally without requiring cloud services or API keys.
+अनुवादिनी is an end-to-end offline AI-powered translation system that translates **text, audio, and video** into multiple languages while preserving accessibility through **speech synthesis** and **subtitle generation**. All processing is performed locally without requiring cloud services or API keys.
 
 ---
 
 ## Demo
 
-![VoxBridge Demo](walkthrough/demo.gif)
+![अनुवादिनी Demo](walkthrough/demo.gif)
 
 ---
 
@@ -85,11 +85,11 @@ Translated Output
 
 # Design Decisions
 
-VoxBridge prioritizes **translation quality**, **offline execution**, and **subtitle consistency** over aggressive parallel processing.
+अनुवादिनी prioritizes **translation quality**, **offline execution**, and **subtitle consistency** over aggressive parallel processing.
 
 ### Full-Context Translation
 
-Instead of translating each Whisper segment independently, VoxBridge first generates a complete transcript and translates it as a single document.
+Instead of translating each Whisper segment independently, अनुवादिनी first generates a complete transcript and translates it as a single document.
 
 This approach:
 
@@ -120,7 +120,7 @@ No cloud APIs, internet connection, or API keys are required after setup.
 # Project Structure
 
 ```text
-VoxBridge
+अनुवादिनी
 │
 ├── app/
 │   ├── ai/
@@ -147,9 +147,9 @@ VoxBridge
 Clone the repository
 
 ```bash
-git clone https://github.com/<your-username>/VoxBridge.git
+git clone https://github.com/<your-username>/अनुवादिनी.git
 
-cd VoxBridge
+cd अनुवादिनी
 ```
 
 Create a virtual environment
@@ -170,7 +170,7 @@ pip install -r requirements.txt
 
 ---
 
-# Running VoxBridge
+# Running अनुवादिनी
 
 Launch the application
 
@@ -256,7 +256,7 @@ Potential enhancements include:
 
 # Generated Outputs
 
-Depending on the input type, VoxBridge produces:
+Depending on the input type, अनुवादिनी produces:
 
 - 📄 Translated Text
 - 🎙️ Transcript
