@@ -121,7 +121,7 @@ def process_speech_input(
         transcription_result["detected_language"]
     )
 
-    translated_text = translate_text(
+    translated_text = translate_long_text(
         transcription_result["transcript_text"],
         resolved_language,
         target_language
@@ -269,3 +269,39 @@ def process_file(request: ProcessRequest):
         raise HTTPException(status_code=404, detail="Input file not found")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+def chunk_text(text: str, max_chars: int = 900) -> list[str]:
+    sentences = text.replace("।", "।\n").replace(".", ".\n").splitlines()
+
+    chunks = []
+    current = ""
+
+    for sentence in sentences:
+        sentence = sentence.strip()
+        if not sentence:
+            continue
+
+        if len(current) + len(sentence) + 1 <= max_chars:
+            current = f"{current} {sentence}".strip()
+        else:
+            if current:
+                chunks.append(current)
+            current = sentence
+
+    if current:
+        chunks.append(current)
+
+    return chunks
+
+
+def translate_long_text(text: str, source_language: str, target_language: str) -> str:
+    chunks = chunk_text(text, max_chars=900)
+
+    translated_chunks = []
+    for chunk in chunks:
+        translated_chunks.append(
+            translate_text(chunk, source_language, target_language)
+        )
+
+    return "\n\n".join(translated_chunks)
