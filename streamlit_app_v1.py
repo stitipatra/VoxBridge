@@ -160,7 +160,7 @@ def mode_config(mode: str):
     )
 
 
-hsbc_logo = image_to_base64("assets/hsbc_logo.png")
+hsbc_logo = image_to_base64("assets/bits_logo.png")
 baif_logo = image_to_base64("assets/baif.png")
 hsbc_img = f'<img src="data:image/png;base64,{hsbc_logo}" alt="HSBC" />' if hsbc_logo else '<div class="logo-fallback">HSBC</div>'
 baif_img = f'<img src="data:image/png;base64,{baif_logo}" alt="BAIF" />' if baif_logo else '<div class="logo-fallback">BAIF</div>'
