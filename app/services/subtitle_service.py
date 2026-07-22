@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+import re
 
 SUBTITLE_DIR = os.path.join("storage", "subtitles")
 os.makedirs(SUBTITLE_DIR, exist_ok=True)
@@ -56,65 +57,139 @@ def generate_translated_srt(original_segments: list, translated_text: str, outpu
     return generate_srt(translated_segments, output_name)
 
 
-def split_segment_for_subtitles(segment: dict, max_chars: int = 45) -> list:
+def split_text_at_natural_pauses(text: str) -> list[str]:
+    parts = re.split(r"(?<=[।.!?])\s+|(?<=,)\s+", text.strip())
+
+    return [
+        part.strip()
+        for part in parts
+        if part.strip()
+    ]
+
+
+def split_segment_for_subtitles(
+    segment: dict,
+    max_line_chars: int = 28,
+    max_lines: int = 2
+) -> list:
     text = segment["text"].strip()
-    start = segment["start"]
-    end = segment["end"]
+    start = float(segment["start"])
+    end = float(segment["end"])
 
-    if len(text) <= max_chars:
-        return [segment]
+    if not text:
+        return []
 
-    words = text.split()
-    chunks = []
-    current = ""
+    if end <= start:
+        return [{
+            "start": start,
+            "end": end,
+            "text": text
+        }]
 
-    for word in words:
-        if len(current) + len(word) + 1 <= max_chars:
-            current = f"{current} {word}".strip()
-        else:
-            chunks.append(current)
-            current = word
+    phrases = split_text_at_natural_pauses(text)
 
-    if current:
-        chunks.append(current)
+    subtitle_texts = []
+    current_lines = []
+    current_line = ""
 
-    duration = end - start
-    chunk_duration = duration / len(chunks)
+    for phrase in phrases:
+        words = phrase.split()
 
+        for word in words:
+            candidate = f"{current_line} {word}".strip()
+
+            if not current_line or len(candidate) <= max_line_chars:
+                current_line = candidate
+                continue
+
+            current_lines.append(current_line)
+            current_line = word
+
+            if len(current_lines) == max_lines:
+                subtitle_texts.append("\n".join(current_lines))
+                current_lines = []
+
+        # Prefer ending the current subtitle after punctuation.
+        if phrase.endswith(("।", ".", "!", "?")):
+            if current_line:
+                current_lines.append(current_line)
+                current_line = ""
+
+            if current_lines:
+                subtitle_texts.append("\n".join(current_lines))
+                current_lines = []
+
+    if current_line:
+        current_lines.append(current_line)
+
+    if current_lines:
+        subtitle_texts.append("\n".join(current_lines))
+
+    if not subtitle_texts:
+        return []
+
+    if len(subtitle_texts) == 1:
+        return [{
+            "start": start,
+            "end": end,
+            "text": subtitle_texts[0]
+        }]
+
+    total_duration = end - start
+
+    weights = [
+        max(
+            1,
+            len(
+                subtitle_text
+                .replace(" ", "")
+                .replace("\n", "")
+            )
+        )
+        for subtitle_text in subtitle_texts
+    ]
+
+    total_weight = sum(weights)
     split_segments = []
+    current_start = start
 
-    for index, chunk in enumerate(chunks):
+    for index, subtitle_text in enumerate(subtitle_texts):
+        is_last = index == len(subtitle_texts) - 1
+
+        if is_last:
+            current_end = end
+        else:
+            allocated_duration = (
+                total_duration * weights[index] / total_weight
+            )
+            current_end = current_start + allocated_duration
+
         split_segments.append({
-            "start": start + index * chunk_duration,
-            "end": start + (index + 1) * chunk_duration,
-            "text": chunk
+            "start": round(current_start, 3),
+            "end": round(current_end, 3),
+            "text": subtitle_text
         })
+
+        current_start = current_end
 
     return split_segments
 
 
-def split_segments_for_subtitles(segments: list, max_chars: int = 45) -> list:
+def split_segments_for_subtitles(
+    segments: list,
+    max_line_chars: int = 28
+) -> list:
     final_segments = []
 
     for segment in segments:
         final_segments.extend(
-            split_segment_for_subtitles(segment, max_chars)
+            split_segment_for_subtitles(
+                segment,
+                max_line_chars=max_line_chars
+            )
         )
 
     return final_segments
-
-
-def format_ass_time(seconds: float) -> str:
-    hours = int(seconds // 3600)
-    minutes = int((seconds % 3600) // 60)
-    secs = int(seconds % 60)
-    centiseconds = int((seconds - int(seconds)) * 100)
-
-    return f"{hours}:{minutes:02d}:{secs:02d}.{centiseconds:02d}"
-
-
-def escape_ass_text(text: str) -> str:
-    return text.replace("\n", "\\N").replace("{", "").replace("}", "")
 
 
 def format_ass_time(seconds: float) -> str:
@@ -149,13 +224,13 @@ def generate_ass(
     )
 
     if video_width < 720:
-        font_size = max(58, int(video_height * 0.075))
+        font_size = max(52, int(video_height * 0.075))
         margin_v = max(42, int(video_height * 0.055))
         margin_lr = max(36, int(video_width * 0.08))
 
     else:
-        font_size = max(34, int(video_height * 0.045))
-        margin_v = max(40, int(video_height * 0.045))
+        font_size = max(30, int(video_height * 0.045))
+        margin_v = max(30, int(video_height * 0.045))
         margin_lr = max(60, int(video_width * 0.07))
 
     ass_header = f"""[Script Info]
@@ -169,7 +244,7 @@ YCbCr Matrix: TV.709
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,Noto Sans Devanagari,{font_size},&H00FFFFFF,&H000000FF,&H00000000,&H99000000,0,0,0,0,100,100,0,0,1,2,1,2,{margin_lr},{margin_lr},{margin_v},1
+Style: Default,Noto Sans Devanagari,{font_size},&H00FFFFFF,&H000000FF,&H00000000,&H99000000,0,0,0,0,100,88,-2,0,1,2,1,2,{margin_lr},{margin_lr},{margin_v},1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
