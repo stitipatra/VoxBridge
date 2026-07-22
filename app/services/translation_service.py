@@ -40,7 +40,12 @@ def translate_text(text: str, source_language: str, target_language: str) -> str
     output_tokens = model.generate(
         **inputs,
         forced_bos_token_id=forced_bos_token_id,
-        max_length=512
+        max_new_tokens=384,
+        num_beams=5,
+        repetition_penalty=1.1,
+        no_repeat_ngram_size=4,
+        length_penalty=1.0,
+        early_stopping=True
     )
 
     translated_text = tokenizer.batch_decode(
@@ -48,4 +53,4 @@ def translate_text(text: str, source_language: str, target_language: str) -> str
         skip_special_tokens=True
     )[0]
 
-    return translated_text
+    return translated_text.strip()
