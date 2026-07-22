@@ -103,7 +103,7 @@ def match_audio_duration(audio_path: str, target_duration: float) -> str:
     else:
         speed_factor = speed_factor
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     adjusted_audio_path = os.path.join(
         AUDIO_OUTPUT_DIR,
         f"duration_matched_audio_{timestamp}.wav"
@@ -137,7 +137,7 @@ def merge_audio_with_video(
     audio_path: str,
     subtitle_path: str | None = None
 ) -> str:
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
 
     output_video_path = os.path.join(
         VIDEO_OUTPUT_DIR,

@@ -32,7 +32,7 @@ def generate_speech(text: str, target_language: str, voice_gender: str = "male")
 
     voice_code = VOICE_CODES[target_language][voice_gender]
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     input_text_path = os.path.join(
         TTS_OUTPUT_DIR,
         f"tts_input_{timestamp}.txt"

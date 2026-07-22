@@ -18,7 +18,7 @@ def format_timestamp(seconds: float) -> str:
 
 
 def generate_srt(segments: list, output_name: str = "subtitles") -> str:
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     subtitle_path = os.path.join(
         SUBTITLE_DIR,
         f"{output_name}_{timestamp}.srt"
@@ -217,7 +217,7 @@ def generate_ass(
     SUBTITLE_OUTPUT_DIR = os.path.join("storage", "subtitles")
     os.makedirs(SUBTITLE_OUTPUT_DIR, exist_ok=True)
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     output_path = os.path.join(
         SUBTITLE_OUTPUT_DIR,
         f"{output_name}_{timestamp}.ass"
