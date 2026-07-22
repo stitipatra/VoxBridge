@@ -228,8 +228,19 @@ def process_speech_input(
     else:
         video_width, video_height = 1280, 720
 
-    translated_subtitle_path = generate_ass(
+    formatted_segments = split_segments_for_subtitles(
         translated_segments,
+        max_line_chars=28
+    )
+
+    for segment in formatted_segments:
+        print(
+            f'{segment["start"]:.2f} -> {segment["end"]:.2f} | '
+            f'{segment["text"]!r}'
+        )
+
+    translated_subtitle_path = generate_ass(
+        formatted_segments,
         translated_subtitle_name,
         video_width,
         video_height
