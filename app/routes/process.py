@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from fastapi import APIRouter, HTTPException
-
+import re
 from app.services.translation_service import translate_text
 from app.services.output_service import save_text_output
 from app.services.media_service import extract_audio_from_video, convert_audio_to_wav
@@ -29,22 +29,62 @@ def resolve_source_language(requested_language: str, detected_language: str) -> 
 def translate_segments(
     segments: list,
     source_language: str,
-    target_language: str
+    target_language: str,
+    max_chars: int = 300
 ) -> list:
-    translated_segments = []
+    grouped_segments = []
+    current_text_parts = []
+    current_start = None
+    current_end = None
 
     for segment in segments:
-        translated_segment_text = translate_text(
-            segment["text"],
+        segment_text = segment["text"].strip()
+
+        if not segment_text:
+            continue
+
+        candidate_text = " ".join(current_text_parts + [segment_text])
+
+        if current_text_parts and len(candidate_text) > max_chars:
+            grouped_segments.append({
+                "start": current_start,
+                "end": current_end,
+                "text": " ".join(current_text_parts)
+            })
+
+            current_text_parts = [segment_text]
+            current_start = segment["start"]
+            current_end = segment["end"]
+
+        else:
+            if current_start is None:
+                current_start = segment["start"]
+
+            current_text_parts.append(segment_text)
+            current_end = segment["end"]
+
+    if current_text_parts:
+        grouped_segments.append({
+            "start": current_start,
+            "end": current_end,
+            "text": " ".join(current_text_parts)
+        })
+
+    translated_segments = []
+
+    for group in grouped_segments:
+        translated_text = translate_text(
+            group["text"],
             source_language,
             target_language
-        )
+        ).strip()
 
-        translated_segments.append({
-            "start": segment["start"],
-            "end": segment["end"],
-            "text": translated_segment_text
-        })
+        if translated_text:
+            translated_segments.append({
+                "start": group["start"],
+                "end": group["end"],
+                "text": translated_text
+            })
 
     return translated_segments
 
@@ -121,7 +161,7 @@ def process_speech_input(
         transcription_result["detected_language"]
     )
 
-    translated_text = translate_long_text(
+    '''translated_text = translate_long_text(
         transcription_result["transcript_text"],
         resolved_language,
         target_language
@@ -137,11 +177,11 @@ def process_speech_input(
         original_subtitle_name
     )
 
-    translated_segments = translate_segments(
-        transcription_result["segments"],
-        resolved_language,
-        target_language
-    )
+    #translated_segments = translate_segments(
+    #    transcription_result["segments"],
+    #    resolved_language,
+    #    target_language
+    #)
 
     subtitle_max_chars = {
         "en": 28,
@@ -153,6 +193,28 @@ def process_speech_input(
         translated_text,
         transcription_result["duration"],
         subtitle_max_chars.get(target_language, 28)
+    )'''
+
+    original_subtitle_path = generate_srt(
+        transcription_result["segments"],
+        original_subtitle_name
+    )
+
+    translated_segments = translate_segments(
+        transcription_result["segments"],
+        resolved_language,
+        target_language
+    )
+
+    translated_text = " ".join(
+        segment["text"].strip()
+        for segment in translated_segments
+        if segment["text"].strip()
+    )
+
+    translated_text_path = save_text_output(
+        translated_text,
+        translation_output_name
     )
 
     '''translated_subtitle_path = generate_srt(
@@ -271,37 +333,83 @@ def process_file(request: ProcessRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-def chunk_text(text: str, max_chars: int = 900) -> list[str]:
-    sentences = text.replace("।", "।\n").replace(".", ".\n").splitlines()
+def chunk_text(text: str, max_chars: int = 400) -> list[str]:
+    text = re.sub(r"\s+", " ", text).strip()
+
+    if not text:
+        return []
+
+    # Split after English or Devanagari sentence-ending punctuation.
+    sentences = re.split(r"(?<=[.!?।])\s+", text)
 
     chunks = []
-    current = ""
+    current_sentences = []
+    current_length = 0
 
     for sentence in sentences:
         sentence = sentence.strip()
+
         if not sentence:
             continue
 
-        if len(current) + len(sentence) + 1 <= max_chars:
-            current = f"{current} {sentence}".strip()
-        else:
-            if current:
-                chunks.append(current)
-            current = sentence
+        # Handle an abnormally long ASR sentence.
+        if len(sentence) > max_chars:
+            if current_sentences:
+                chunks.append(" ".join(current_sentences))
+                current_sentences = []
+                current_length = 0
 
-    if current:
-        chunks.append(current)
+            words = sentence.split()
+            word_chunk = []
+
+            for word in words:
+                candidate = " ".join(word_chunk + [word])
+
+                if len(candidate) <= max_chars:
+                    word_chunk.append(word)
+                else:
+                    if word_chunk:
+                        chunks.append(" ".join(word_chunk))
+                    word_chunk = [word]
+
+            if word_chunk:
+                chunks.append(" ".join(word_chunk))
+
+            continue
+
+        candidate_length = current_length + len(sentence) + 1
+
+        if current_sentences and candidate_length > max_chars:
+            chunks.append(" ".join(current_sentences))
+            current_sentences = [sentence]
+            current_length = len(sentence)
+        else:
+            current_sentences.append(sentence)
+            current_length = candidate_length
+
+    if current_sentences:
+        chunks.append(" ".join(current_sentences))
 
     return chunks
 
 
-def translate_long_text(text: str, source_language: str, target_language: str) -> str:
-    chunks = chunk_text(text, max_chars=900)
+def translate_long_text(
+    text: str,
+    source_language: str,
+    target_language: str
+) -> str:
+    chunks = chunk_text(text, max_chars=100)
 
     translated_chunks = []
+
     for chunk in chunks:
-        translated_chunks.append(
-            translate_text(chunk, source_language, target_language)
+        translated_chunk = translate_text(
+            chunk,
+            source_language,
+            target_language
         )
+
+        if translated_chunk.strip():
+            translated_chunks.append(translated_chunk.strip())
 
     return "\n\n".join(translated_chunks)
