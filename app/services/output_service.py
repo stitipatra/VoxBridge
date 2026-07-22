@@ -7,7 +7,7 @@ os.makedirs(TRANSLATION_DIR, exist_ok=True)
 
 
 def save_text_output(text: str, output_type: str = "translation") -> str:
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     filename = f"{output_type}_{timestamp}.txt"
     file_path = os.path.join(TRANSLATION_DIR, filename)
 

@@ -6,7 +6,7 @@ from app.config import FFMPEG_PATH, AUDIO_OUTPUT_DIR
 
 
 def extract_audio_from_video(video_path: str) -> str:
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     output_audio_path = os.path.join(
         AUDIO_OUTPUT_DIR,
         f"extracted_audio_{timestamp}.wav"
@@ -37,7 +37,7 @@ def extract_audio_from_video(video_path: str) -> str:
 
 
 def convert_audio_to_wav(audio_path: str) -> str:
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     output_audio_path = os.path.join(
         AUDIO_OUTPUT_DIR,
         f"converted_audio_{timestamp}.wav"

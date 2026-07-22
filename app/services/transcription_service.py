@@ -69,7 +69,7 @@ def transcribe_audio(audio_path: str, source_language: str = "en") -> dict:
 
     transcript_text = " ".join(transcript_parts)
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     transcript_path = os.path.join(
         TRANSCRIPT_DIR,
         f"transcript_{timestamp}.txt"
