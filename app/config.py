@@ -8,6 +8,8 @@ FFPROBE_PATH = os.path.join(BASE_DIR, "tools", "ffmpeg", "bin", "ffprobe.exe")
 STORAGE_DIR = os.path.join(BASE_DIR, "storage")
 AUDIO_OUTPUT_DIR = os.path.join(STORAGE_DIR, "audio_output")
 
+PIPER_PATH = "piper"
+
 ESPEAK_PATH = os.path.join(BASE_DIR, "tools", "espeak", "espeak-ng.exe")
 ESPEAK_DATA_PATH = os.path.join(BASE_DIR, "tools", "espeak", "espeak-ng-data")
 
