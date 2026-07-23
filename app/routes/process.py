@@ -1,13 +1,19 @@
 from pydantic import BaseModel
 from fastapi import APIRouter, HTTPException
 import re
+import os
 from app.services.translation_service import translate_text
 from app.services.output_service import save_text_output
 from app.services.media_service import extract_audio_from_video, convert_audio_to_wav
 from app.services.transcription_service import transcribe_audio
 from app.services.subtitle_service import generate_srt, split_segments_for_subtitles, generate_ass
 from app.services.tts_service import generate_speech
-from app.services.video_service import merge_audio_with_video, get_video_dimensions
+from app.services.video_service import (
+    merge_audio_with_video,
+    get_video_dimensions,
+    generate_segment_audio_clips,
+    create_synchronized_audio
+)
 
 router = APIRouter(prefix="/process", tags=["Process"])
 
@@ -246,17 +252,37 @@ def process_speech_input(
         video_height
     )
 
-    translated_audio_path = generate_speech(
-        translated_text,
-        target_language,
-        voice_gender
-    )
-
     if input_type == "video":
+
+        segment_audio_clips = generate_segment_audio_clips(
+            translated_segments,
+            target_language,
+            voice_gender
+        )
+
+        translated_audio_path = create_synchronized_audio(segment_audio_clips)
+
         translated_video_path = merge_audio_with_video(
             input_path,
             translated_audio_path,
             translated_subtitle_path
+        )
+
+        # Cleanup temporary clips
+        for clip in segment_audio_clips:
+            for temp_path in clip["temporary_paths"]:
+                try:
+                    if os.path.exists(temp_path):
+                        os.remove(temp_path)
+                except OSError:
+                    pass
+
+    else:
+
+        translated_audio_path = generate_speech(
+            translated_text,
+            target_language,
+            voice_gender
         )
 
     return {
