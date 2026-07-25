@@ -615,25 +615,28 @@ st.markdown(
             }
         }
         .processing-title {
-            color: var(--blue-950); font-size: 22px; font-weight: 950; margin-bottom: 8px;
+            color: var(--blue-950);
+            font-size: 24px;
+            font-weight: 800;
+            margin-top: 8px;
+            margin-bottom: 6px;
+            letter-spacing: -0.3px;
         }
+        
+        .processing-stage {
+            color: var(--blue-900);
+            font-size: 19px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
         .processing-subtitle {
-            color: #42536b; font-size: 14.5px; font-weight: 700; line-height: 1.5;
-        }
-        .pipeline-dots {
-            display: flex; justify-content: center; gap: 10px; margin-top: 18px;
-        }
-        .pipeline-dots span {
-            width: 11px; height: 11px; border-radius: 999px;
-            background: #25a7df; animation: pulse 1.15s infinite ease-in-out;
-        }
-        .pipeline-dots span:nth-child(2) { background: #62b6ff; animation-delay: .12s; }
-        .pipeline-dots span:nth-child(3) { background: #7c7ff2; animation-delay: .24s; }
-        .pipeline-dots span:nth-child(4) { background: #9a79df; animation-delay: .36s; }
-        .pipeline-dots span:nth-child(5) { background: #e47bd2; animation-delay: .48s; }
-        @keyframes pulse {
-            0%, 100% { transform: scale(.78); opacity: .45; }
-            50% { transform: scale(1.22); opacity: 1; }
+            color: #6b7280;
+            font-size: 13px;
+            font-weight: 500;
+            line-height: 1.45;
+            margin-top: 4px;
+            opacity: 0.9;
         }
         .progress-percent {
             color: var(--blue-900); font-weight: 950; margin-top: 10px; font-size: 14px;
@@ -856,21 +859,18 @@ if st.session_state.selected_mode in ["Home", "Text Translation", "Audio Transla
                 # Keep the HTML continuous. Blank lines inside nested raw HTML can cause
                 # Streamlit Markdown to display the remaining tags as code.
                 loader_html = (
-                    '<div class="loader-card">'
+                    '<div id="processing-loader" class="loader-card">'
                     '<div class="orb-loader">'
                     f'<div class="orb-percent">{progress}%</div>'
                     '</div>'
-                    f'<div class="processing-title">{stage}</div>'
+
+                    '<div class="processing-title">अनुवादिनी is working its magic...</div>'
+
+                    f'<div class="processing-stage">{stage}</div>'
+
                     '<div class="processing-subtitle">'
-                    'Transcribing speech · Translating text · Generating subtitles · '
-                    'Creating voice · Rendering video'
-                    '</div>'
-                    '<div class="pipeline-dots">'
-                    '<span></span>'
-                    '<span></span>'
-                    '<span></span>'
-                    '<span></span>'
-                    '<span></span>'
+                    'Transcribing speech · Translating text · '
+                    'Generating subtitles · Creating voice · Rendering video'
                     '</div>'
                     '</div>'
                 )
@@ -1010,6 +1010,25 @@ if st.session_state.selected_mode in ["Home", "Text Translation", "Audio Transla
                 update_processing_ui(
                     1,
                     "अनुवादिनी is starting"
+                )
+
+                st.components.v1.html(
+                    """
+                    <script>
+                    setTimeout(() => {
+                        const loader =
+                            window.parent.document.getElementById("processing-loader");
+
+                        if (loader) {
+                            loader.scrollIntoView({
+                                behavior: "smooth",
+                                block: "center"
+                            });
+                        }
+                    }, 150);
+                    </script>
+                    """,
+                    height=0,
                 )
 
                 result = process_file(
