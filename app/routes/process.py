@@ -2,12 +2,14 @@ from pydantic import BaseModel
 from fastapi import APIRouter, HTTPException
 import re
 import os
+import time
 from app.services.translation_service import translate_text
 from app.services.output_service import save_text_output
 from app.services.media_service import extract_audio_from_video, convert_audio_to_wav
 from app.services.transcription_service import transcribe_audio
 from app.services.subtitle_service import generate_srt, split_segments_for_subtitles, generate_ass
 from app.services.tts_service import generate_speech
+from typing import Callable, Optional
 from app.services.video_service import (
     merge_audio_with_video,
     get_video_dimensions,
@@ -24,6 +26,11 @@ class ProcessRequest(BaseModel):
     source_language: str
     target_language: str
     voice_gender: str = "male"
+
+
+def log_timing(message):
+    with open("timing_report.txt", "a", encoding="utf-8") as f:
+        f.write(message + "\n")
 
 
 def resolve_source_language(requested_language: str, detected_language: str) -> str:
@@ -142,7 +149,14 @@ def process_speech_input(
     target_language: str,
     voice_gender: str
 ):
+    print(">>> ENTERED process_speech_input <<<", flush=True)
+    open("timing_report.txt", "w").close()
+    total_start = time.perf_counter()
+    stage_timings = {}
+
     translated_video_path = None
+
+    stage_start = time.perf_counter()
 
     if input_type == "video":
         prepared_audio_path = extract_audio_from_video(input_path)
@@ -157,9 +171,19 @@ def process_speech_input(
     else:
         raise ValueError(f"Unsupported speech input type: {input_type}")
 
+    stage_timings["audio_preparation"] = (
+        time.perf_counter() - stage_start
+    )
+
+    stage_start = time.perf_counter()
+
     transcription_result = transcribe_audio(
         prepared_audio_path,
         source_language
+    )
+
+    stage_timings["transcription"] = (
+        time.perf_counter() - stage_start
     )
 
     resolved_language = resolve_source_language(
@@ -201,6 +225,8 @@ def process_speech_input(
         subtitle_max_chars.get(target_language, 28)
     )'''
 
+    stage_start = time.perf_counter()
+
     original_subtitle_path = generate_srt(
         transcription_result["segments"],
         original_subtitle_name
@@ -211,6 +237,12 @@ def process_speech_input(
         resolved_language,
         target_language
     )
+
+    stage_timings["translation"] = (
+        time.perf_counter() - stage_start
+    )
+
+    stage_start = time.perf_counter()
 
     translated_text = " ".join(
         segment["text"].strip()
@@ -239,11 +271,11 @@ def process_speech_input(
         max_line_chars=28
     )
 
-    for segment in formatted_segments:
+    '''for segment in formatted_segments:
         print(
             f'{segment["start"]:.2f} -> {segment["end"]:.2f} | '
             f'{segment["text"]!r}'
-        )
+        )'''
 
     translated_subtitle_path = generate_ass(
         formatted_segments,
@@ -252,7 +284,13 @@ def process_speech_input(
         video_height
     )
 
+    stage_timings["subtitle_generation"] = (
+        time.perf_counter() - stage_start
+    )
+
     if input_type == "video":
+
+        stage_start = time.perf_counter()
 
         segment_audio_clips = generate_segment_audio_clips(
             translated_segments,
@@ -260,13 +298,31 @@ def process_speech_input(
             voice_gender
         )
 
+        stage_timings["tts_generation"] = (
+            time.perf_counter() - stage_start
+        )
+
+        stage_start = time.perf_counter()
+
         translated_audio_path = create_synchronized_audio(segment_audio_clips)
+
+        stage_timings["audio_synchronization"] = (
+            time.perf_counter() - stage_start
+        )
+
+        stage_start = time.perf_counter()
 
         translated_video_path = merge_audio_with_video(
             input_path,
             translated_audio_path,
             translated_subtitle_path
         )
+
+        stage_timings["video_rendering"] = (
+            time.perf_counter() - stage_start
+        )
+
+        stage_start = time.perf_counter()
 
         # Cleanup temporary clips
         for clip in segment_audio_clips:
@@ -276,14 +332,60 @@ def process_speech_input(
                         os.remove(temp_path)
                 except OSError:
                     pass
+        stage_timings["cleanup"] = (
+            time.perf_counter() - stage_start
+        )
 
     else:
+
+        stage_start = time.perf_counter()
 
         translated_audio_path = generate_speech(
             translated_text,
             target_language,
             voice_gender
         )
+
+        stage_timings["tts_generation"] = (
+            time.perf_counter() - stage_start
+        )
+
+    total_time = time.perf_counter() - total_start
+
+    log_timing("")
+
+    log_timing("=" * 60)
+    log_timing("ANUWADINI PROCESSING TIME REPORT")
+    log_timing("=" * 60)
+
+    for stage_name, duration in stage_timings.items():
+        percentage = (
+            duration / total_time * 100
+            if total_time > 0
+            else 0
+        )
+
+        readable_name = stage_name.replace("_", " ").title()
+
+        log_timing(
+            f"{readable_name:<28}"
+            f"{duration:>9.2f} sec "
+            f"({percentage:>6.2f}%)"
+        )
+
+    measured_time = sum(stage_timings.values())
+    unmeasured_time = max(0.0, total_time - measured_time)
+
+    log_timing(
+        f"{'Unmeasured / Overhead':<28}"
+        f"{unmeasured_time:>9.2f} sec "
+        f"({(unmeasured_time / total_time * 100) if total_time > 0 else 0:>6.2f}%)"
+    )
+
+    log_timing("-" * 60)
+    log_timing(f"{'Total':<28}{total_time:>9.2f} sec")
+    log_timing("=" * 60)
+    log_timing("")
 
     return {
         "message": f"{input_type.capitalize()} processed successfully",
@@ -310,6 +412,7 @@ def process_speech_input(
 
 @router.post("/")
 def process_file(request: ProcessRequest):
+    print("\n>>> PROCESS_FILE STARTED <<<", flush=True)
     try:
         if request.input_type in {"video", "audio"}:
             return process_speech_input(
