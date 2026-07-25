@@ -2,13 +2,16 @@
 ============================================================
 ANUWADINI PROCESSING TIME REPORT
 ============================================================
-Audio Preparation                0.05 sec (  0.14%)
-Transcription                   23.63 sec ( 65.78%)
-Translation                      8.47 sec ( 23.56%)
-Subtitle Generation              0.33 sec (  0.91%)
-Tts Generation                   2.76 sec (  7.69%)
-Unmeasured / Overhead            0.69 sec (  1.91%)
+Audio Preparation                0.07 sec (  0.16%)
+Transcription                   21.40 sec ( 45.19%)
+Translation                     16.37 sec ( 34.57%)
+Subtitle Generation              0.41 sec (  0.86%)
+Tts Generation                   4.87 sec ( 10.28%)
+Audio Synchronization            0.04 sec (  0.08%)
+Video Rendering                  2.22 sec (  4.68%)
+Cleanup                          0.33 sec (  0.69%)
+Unmeasured / Overhead            1.65 sec (  3.48%)
 ------------------------------------------------------------
-Total                           35.93 sec
+Total                           47.35 sec
 ============================================================
 
