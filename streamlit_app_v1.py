@@ -1003,7 +1003,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 st.markdown(
     """
     <div class="footer-note">
-        © 2025 अनुवादिनी &nbsp; | &nbsp; Breaking Language Barriers &nbsp; | &nbsp; Offline • Private • Secure
+        © 2026 अनुवादिनी &nbsp; | &nbsp; Breaking Language Barriers &nbsp; | &nbsp; Offline • Private • Secure
     </div>
     """,
     unsafe_allow_html=True,

@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException
 import re
 import os
 import time
+from concurrent.futures import ThreadPoolExecutor
 from app.services.translation_service import translate_text
 from app.services.output_service import save_text_output
 from app.services.media_service import extract_audio_from_video, convert_audio_to_wav
@@ -43,7 +44,10 @@ def translate_segments(
     segments: list,
     source_language: str,
     target_language: str,
-    max_chars: int = 300
+    max_chars: int = 300,
+    progress_callback=None,
+    progress_start=38,
+    progress_end=68
 ) -> list:
     grouped_segments = []
     current_text_parts = []
@@ -85,7 +89,10 @@ def translate_segments(
 
     translated_segments = []
 
-    for group in grouped_segments:
+    total_groups = max(len(grouped_segments), 1)
+
+    for index, group in enumerate(grouped_segments):
+
         translated_text = translate_text(
             group["text"],
             source_language,
@@ -98,6 +105,19 @@ def translate_segments(
                 "end": group["end"],
                 "text": translated_text
             })
+
+        if progress_callback:
+            completed = index + 1
+
+            progress = progress_start + int(
+                completed / total_groups
+                * (progress_end - progress_start)
+            )
+
+            progress_callback(
+                min(progress, progress_end),
+                f"Translating content ({completed}/{total_groups})"
+            )
 
     return translated_segments
 
@@ -147,9 +167,16 @@ def process_speech_input(
     input_path: str,
     source_language: str,
     target_language: str,
-    voice_gender: str
+    voice_gender: str,
+    progress_callback=None
 ):
     print(">>> ENTERED process_speech_input <<<", flush=True)
+
+    def report_progress(progress, stage):
+        if progress_callback:
+            progress_callback(progress, stage)
+
+    report_progress(3, "Preparing uploaded file")
     open("timing_report.txt", "w").close()
     total_start = time.perf_counter()
     stage_timings = {}
@@ -175,16 +202,43 @@ def process_speech_input(
         time.perf_counter() - stage_start
     )
 
+    report_progress(8, "Transcribing speech")
+
     stage_start = time.perf_counter()
 
-    transcription_result = transcribe_audio(
-        prepared_audio_path,
-        source_language
-    )
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        transcription_future = executor.submit(
+            transcribe_audio,
+            prepared_audio_path,
+            source_language
+        )
+
+        estimated_progress = 8
+
+        while not transcription_future.done():
+            elapsed = time.perf_counter() - stage_start
+
+            # Moves quickly at first, then slows down near 35%.
+            estimated_progress = min(
+                37,
+                8 + int(elapsed / 2)
+            )
+
+            report_progress(
+                estimated_progress,
+                "Transcribing speech"
+            )
+
+            time.sleep(0.5)
+
+        # Raises the original error if transcription failed.
+        transcription_result = transcription_future.result()
 
     stage_timings["transcription"] = (
         time.perf_counter() - stage_start
     )
+
+    report_progress(38, "Translating content")
 
     resolved_language = resolve_source_language(
         source_language,
@@ -235,7 +289,10 @@ def process_speech_input(
     translated_segments = translate_segments(
         transcription_result["segments"],
         resolved_language,
-        target_language
+        target_language,
+        progress_callback=progress_callback,
+        progress_start=38,
+        progress_end=68
     )
 
     stage_timings["translation"] = (
@@ -254,6 +311,8 @@ def process_speech_input(
         translated_text,
         translation_output_name
     )
+
+    report_progress(72, "Generating subtitles")
 
     '''translated_subtitle_path = generate_srt(
         translated_segments,
@@ -292,15 +351,40 @@ def process_speech_input(
 
         stage_start = time.perf_counter()
 
-        segment_audio_clips = generate_segment_audio_clips(
-            translated_segments,
-            target_language,
-            voice_gender
-        )
+        report_progress(76, "Generating translated voice")
+
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(
+                generate_segment_audio_clips,
+                translated_segments,
+                target_language,
+                voice_gender
+            )
+
+            stage_start = time.perf_counter()
+
+            while not future.done():
+                elapsed = time.perf_counter() - stage_start
+
+                progress = min(
+                    88,
+                    76 + int(elapsed / 2)
+                )
+
+                report_progress(
+                    progress,
+                    "Generating translated voice"
+                )
+
+                time.sleep(0.5)
+
+            segment_audio_clips = future.result()
 
         stage_timings["tts_generation"] = (
             time.perf_counter() - stage_start
         )
+
+        report_progress(89, "Synchronizing translated audio")
 
         stage_start = time.perf_counter()
 
@@ -312,17 +396,42 @@ def process_speech_input(
 
         stage_start = time.perf_counter()
 
-        translated_video_path = merge_audio_with_video(
-            input_path,
-            translated_audio_path,
-            translated_subtitle_path
-        )
+        report_progress(94, "Rendering final video")
+
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(
+                merge_audio_with_video,
+                input_path,
+                translated_audio_path,
+                translated_subtitle_path
+            )
+
+            stage_start = time.perf_counter()
+
+            while not future.done():
+                elapsed = time.perf_counter() - stage_start
+
+                progress = min(
+                    98,
+                    94 + int(elapsed)
+                )
+
+                report_progress(
+                    progress,
+                    "Rendering final video"
+                )
+
+                time.sleep(0.5)
+
+            translated_video_path = future.result()
 
         stage_timings["video_rendering"] = (
             time.perf_counter() - stage_start
         )
 
         stage_start = time.perf_counter()
+
+        report_progress(99, "Finalizing output")
 
         # Cleanup temporary clips
         for clip in segment_audio_clips:
@@ -387,6 +496,8 @@ def process_speech_input(
     log_timing("=" * 60)
     log_timing("")
 
+    report_progress(100, "Processing complete")
+
     return {
         "message": f"{input_type.capitalize()} processed successfully",
         "input_type": input_type,
@@ -411,7 +522,7 @@ def process_speech_input(
 
 
 @router.post("/")
-def process_file(request: ProcessRequest):
+def process_file(request: ProcessRequest, progress_callback=None):
     print("\n>>> PROCESS_FILE STARTED <<<", flush=True)
     try:
         if request.input_type in {"video", "audio"}:
@@ -420,7 +531,8 @@ def process_file(request: ProcessRequest):
                 request.input_path,
                 request.source_language,
                 request.target_language,
-                request.voice_gender
+                request.voice_gender,
+                progress_callback=progress_callback
             )
 
         if request.input_type != "text":

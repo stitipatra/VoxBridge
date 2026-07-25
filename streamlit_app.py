@@ -2,7 +2,7 @@ import os
 import time
 import base64
 from pathlib import Path
-
+from textwrap import dedent
 import streamlit as st
 
 from app.routes.process import ProcessRequest, process_file
@@ -568,17 +568,52 @@ st.markdown(
             margin: 12px 0 14px 0;
         }
         .orb-loader {
-            width: 70px; height: 70px; border-radius: 50%;
+            width: 82px;
+            height: 82px;
+            border-radius: 50%;
             margin: 0 auto 16px auto;
-            background: conic-gradient(from 180deg, #0b4ea2, #25a7df, #7c7ff2, #e47bd2, #0b4ea2);
-            animation: spin 1s linear infinite;
             position: relative;
+            display: grid;
+            place-items: center;
         }
+
+        .orb-loader::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: conic-gradient(
+                from 180deg,
+                #0b4ea2,
+                #25a7df,
+                #7c7ff2,
+                #e47bd2,
+                #0b4ea2
+            );
+            animation: spin 1s linear infinite;
+        }
+
         .orb-loader::after {
-            content: ""; position: absolute; inset: 11px;
-            border-radius: 50%; background: #ffffff;
+            content: "";
+            position: absolute;
+            inset: 11px;
+            border-radius: 50%;
+            background: white;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .orb-percent {
+            position: relative;
+            z-index: 2;
+            font-size: 18px;
+            font-weight: 950;
+            color: var(--blue-900);
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
         .processing-title {
             color: var(--blue-950); font-size: 22px; font-weight: 950; margin-bottom: 8px;
         }
@@ -792,45 +827,209 @@ if st.session_state.selected_mode in ["Home", "Text Translation", "Audio Transla
             )
 
             loader_placeholder = st.empty()
-            progress_bar = st.progress(0)
-            progress_text = st.empty()
 
-            try:
+            processing_ui_state = {
+                "progress": 0,
+                "stage": None,
+            }
+
+            def get_base_stage(stage: str | None) -> str | None:
+                """
+                Treat stage messages containing counters as the same stage.
+
+                Examples:
+                    Translating content
+                    Translating content (1/10)
+                    Translating content (2/10)
+
+                All become:
+                    Translating content
+                """
+                if not stage:
+                    return None
+
+                return stage.split("(", 1)[0].strip()
+
+            def render_processing_ui(progress: int, stage: str):
+                progress = max(0, min(int(progress), 100))
+
+                # Keep the HTML continuous. Blank lines inside nested raw HTML can cause
+                # Streamlit Markdown to display the remaining tags as code.
+                loader_html = (
+                    '<div class="loader-card">'
+                    '<div class="orb-loader">'
+                    f'<div class="orb-percent">{progress}%</div>'
+                    '</div>'
+                    f'<div class="processing-title">{stage}</div>'
+                    '<div class="processing-subtitle">'
+                    'Transcribing speech · Translating text · Generating subtitles · '
+                    'Creating voice · Rendering video'
+                    '</div>'
+                    '<div class="pipeline-dots">'
+                    '<span></span>'
+                    '<span></span>'
+                    '<span></span>'
+                    '<span></span>'
+                    '<span></span>'
+                    '</div>'
+                    '</div>'
+                )
+
                 loader_placeholder.markdown(
-                    """
-                    <div class="loader-card">
-                        <div class="orb-loader"></div>
-                        <div class="processing-title">अनुवादिनी is working its magic</div>
-                        <div class="processing-subtitle">Transcribing speech · Translating text · Generating subtitles · Creating voice · Rendering video</div>
-                        <div class="pipeline-dots"><span></span><span></span><span></span><span></span><span></span></div>
-                    </div>
-                    """,
+                    loader_html,
                     unsafe_allow_html=True,
                 )
-                for progress, label in [
-                    (10, "📥 Upload saved"),
-                    (25, "🎙️ Transcribing speech"),
-                    (45, "🌐 Translating content"),
-                    (65, "📝 Generating subtitles"),
-                    (82, "🔊 Creating translated speech"),
-                    (95, "🎬 Rendering final output"),
-                ]:
-                    progress_bar.progress(progress)
-                    progress_text.markdown(
-                        f"**{label}** &nbsp; <span class='progress-percent'>{progress}%</span>", unsafe_allow_html=True)
-                    time.sleep(0.25)
 
-                result = process_file(request)
+            def animate_progress(
+                start_progress: int,
+                end_progress: int,
+                stage: str,
+                duration: float = 0.30,
+            ):
+                """
+                Animate between two backend checkpoints without making large jumps
+                take several seconds.
+                """
+                if end_progress <= start_progress:
+                    render_processing_ui(end_progress, stage)
+                    return
+
+                difference = end_progress - start_progress
+
+                # Use at most about 15 visible updates per transition.
+                update_count = min(difference, 15)
+                delay = duration / max(update_count, 1)
+
+                last_displayed = start_progress
+
+                for update_number in range(1, update_count + 1):
+                    fraction = update_number / update_count
+
+                    displayed_progress = round(
+                        start_progress + difference * fraction
+                    )
+
+                    if displayed_progress <= last_displayed:
+                        continue
+
+                    render_processing_ui(
+                        displayed_progress,
+                        stage,
+                    )
+
+                    last_displayed = displayed_progress
+                    time.sleep(delay)
+
+                # Ensure the exact backend checkpoint is shown.
+                if last_displayed != end_progress:
+                    render_processing_ui(
+                        end_progress,
+                        stage,
+                    )
+
+            def update_processing_ui(progress: int, stage: str):
+                target_progress = max(0, min(int(progress), 100))
+
+                current_progress = processing_ui_state["progress"]
+                current_stage = processing_ui_state["stage"]
+
+                current_base_stage = get_base_stage(current_stage)
+                target_base_stage = get_base_stage(stage)
+
+                # First callback.
+                if current_stage is None:
+                    render_processing_ui(
+                        target_progress,
+                        stage,
+                    )
+
+                    processing_ui_state["progress"] = target_progress
+                    processing_ui_state["stage"] = stage
+                    return
+
+                # Ignore backward progress, but allow the displayed message to update.
+                if target_progress < current_progress:
+                    if stage != current_stage:
+                        render_processing_ui(
+                            current_progress,
+                            stage,
+                        )
+                        processing_ui_state["stage"] = stage
+
+                    return
+
+                # Same percentage, but updated information such as (2/10).
+                if target_progress == current_progress:
+                    if stage != current_stage:
+                        render_processing_ui(
+                            current_progress,
+                            stage,
+                        )
+                        processing_ui_state["stage"] = stage
+
+                    return
+
+                stage_changed = current_base_stage != target_base_stage
+
+                if stage_changed:
+                    # Keep the old stage visible while moving to one point before
+                    # the backend-confirmed beginning of the next stage.
+                    old_stage_end = max(
+                        current_progress,
+                        target_progress - 1,
+                    )
+
+                    if old_stage_end > current_progress:
+                        animate_progress(
+                            start_progress=current_progress,
+                            end_progress=old_stage_end,
+                            stage=current_stage,
+                            duration=0.32,
+                        )
+
+                    # Only now enter the new backend-confirmed stage.
+                    render_processing_ui(
+                        target_progress,
+                        stage,
+                    )
+
+                else:
+                    # Same logical stage. This includes translation counters such as:
+                    # Translating content (1/8), (2/8), etc.
+                    animate_progress(
+                        start_progress=current_progress,
+                        end_progress=target_progress,
+                        stage=stage,
+                        duration=0.18,
+                    )
+
+                processing_ui_state["progress"] = target_progress
+                processing_ui_state["stage"] = stage
+
+            try:
+                update_processing_ui(
+                    1,
+                    "अनुवादिनी is starting"
+                )
+
+                result = process_file(
+                    request,
+                    progress_callback=update_processing_ui
+                )
+
                 st.session_state.last_result = result
                 st.session_state.last_uploaded_file_name = uploaded_file.name
-                progress_bar.progress(100)
-                progress_text.markdown(
-                    "**✅ Processing complete** &nbsp; <span class='progress-percent'>100%</span>", unsafe_allow_html=True)
+
+                update_processing_ui(
+                    100,
+                    "✅ Processing complete"
+                )
+
                 time.sleep(0.35)
+
             finally:
                 loader_placeholder.empty()
-                progress_bar.empty()
-                progress_text.empty()
+
         except Exception as e:
             st.error(str(e))
 
@@ -1003,7 +1202,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 st.markdown(
     """
     <div class="footer-note">
-        © 2025 अनुवादिनी &nbsp; | &nbsp; Breaking Language Barriers &nbsp; | &nbsp; Offline • Private • Secure
+        © 2026 अनुवादिनी &nbsp; | &nbsp; Breaking Language Barriers &nbsp; | &nbsp; Offline • Private • Secure
     </div>
     """,
     unsafe_allow_html=True,
