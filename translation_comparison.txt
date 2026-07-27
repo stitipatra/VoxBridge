@@ -1,0 +1,96 @@
+
+====================================================================================================
+GROUP 1
+IDENTICAL: True
+SOURCE LENGTH: 299
+SINGLE LENGTH: 301
+BATCHED LENGTH: 301
+
+SOURCE:
+When I was young my family lived overseas I lived in Indonesia for a few years and my mother She didn't have the money to send me where all the American kids went to school But she thought it was important for me to keep up with an American education So she decided to teach me extra lessons herself
+
+SINGLE TRANSLATION:
+जब मैं छोटा था मेरा परिवार विदेश में रहता था मैं कुछ वर्षों के लिए इंडोनेशिया में रहता था और मेरी माँ के पास मुझे भेजने के लिए पैसे नहीं थे जहां सभी अमेरिकी बच्चे स्कूल गए लेकिन उसने सोचा कि यह मेरे लिए महत्वपूर्ण था अमेरिकी शिक्षा के साथ रखने के लिए तो उसने मुझे अतिरिक्त सबक खुद सिखाने का फैसला किया
+
+BATCHED TRANSLATION:
+जब मैं छोटा था मेरा परिवार विदेश में रहता था मैं कुछ वर्षों के लिए इंडोनेशिया में रहता था और मेरी माँ के पास मुझे भेजने के लिए पैसे नहीं थे जहां सभी अमेरिकी बच्चे स्कूल गए लेकिन उसने सोचा कि यह मेरे लिए महत्वपूर्ण था अमेरिकी शिक्षा के साथ रखने के लिए तो उसने मुझे अतिरिक्त सबक खुद सिखाने का फैसला किया
+
+====================================================================================================
+GROUP 16
+IDENTICAL: True
+SOURCE LENGTH: 276
+SINGLE LENGTH: 317
+BATCHED LENGTH: 317
+
+SOURCE:
+If you don't do that, if you quit on school, you're not just quitting on yourself, you're quitting on your country. I know it's not always easy to do well in school. I know a lot of you have challenges in your lives right now that can make it hard to focus on your schoolwork.
+
+SINGLE TRANSLATION:
+अगर आप ऐसा नहीं करते हैं, अगर आप स्कूल छोड़ देते हैं, तो आप सिर्फ अपने आप को नहीं छोड़ रहे हैं, आप अपने देश को छोड़ रहे हैं. मुझे पता है कि स्कूल में अच्छा करना हमेशा आसान नहीं होता है। मुझे पता है आप में से कई लोगों के पास अपने जीवन में चुनौतियां हैं जो आपके स्कूल के काम पर ध्यान केंद्रित करना मुश्किल बना सकती हैं।
+
+BATCHED TRANSLATION:
+अगर आप ऐसा नहीं करते हैं, अगर आप स्कूल छोड़ देते हैं, तो आप सिर्फ अपने आप को नहीं छोड़ रहे हैं, आप अपने देश को छोड़ रहे हैं. मुझे पता है कि स्कूल में अच्छा करना हमेशा आसान नहीं होता है। मुझे पता है आप में से कई लोगों के पास अपने जीवन में चुनौतियां हैं जो आपके स्कूल के काम पर ध्यान केंद्रित करना मुश्किल बना सकती हैं।
+
+====================================================================================================
+GROUP 17
+IDENTICAL: True
+SOURCE LENGTH: 282
+SINGLE LENGTH: 276
+BATCHED LENGTH: 276
+
+SOURCE:
+I get it, I know what it's like. But at the end of the day, the circumstances of your life, what you look like, where you come from, how much money you have, what you've got going on at home, none of that is an excuse for neglecting your homework or having a bad attitude in school.
+
+SINGLE TRANSLATION:
+मुझे समझ में आता है, मुझे पता है कि यह कैसा है, लेकिन अंत में, आपके जीवन की परिस्थितियां, आप कैसा दिखते हैं, आप कहां से आते हैं, आपके पास कितना पैसा है, आपके घर में क्या हो रहा है, उनमें से कोई भी आपके होमवर्क को नजरअंदाज करने या स्कूल में एक बुरा रवैया रखने का बहाना नहीं है।
+
+BATCHED TRANSLATION:
+मुझे समझ में आता है, मुझे पता है कि यह कैसा है, लेकिन अंत में, आपके जीवन की परिस्थितियां, आप कैसा दिखते हैं, आप कहां से आते हैं, आपके पास कितना पैसा है, आपके घर में क्या हो रहा है, उनमें से कोई भी आपके होमवर्क को नजरअंदाज करने या स्कूल में एक बुरा रवैया रखने का बहाना नहीं है।
+
+====================================================================================================
+GROUP 32
+IDENTICAL: True
+SOURCE LENGTH: 270
+SINGLE LENGTH: 322
+BATCHED LENGTH: 322
+
+SOURCE:
+when you give up on yourself, you give up on your country. The story of America isn't about people who quit when things got tough. It's about people who kept going, who tried harder, who loved their country too much to do anything less than their best. It's the story of
+
+SINGLE TRANSLATION:
+जब आप खुद को छोड़ देते हैं, तो आप अपने देश को भी छोड़ देते हैं. अमेरिका की कहानी उन लोगों के बारे में नहीं है जिन्होंने जब चीजें कठिन हो गईं तो छोड़ दिया। यह उन लोगों की कहानी है जिन्होंने जारी रखा, जिन्होंने कड़ी मेहनत की, जिन्होंने अपने देश से बहुत प्यार किया कि वे अपना सर्वश्रेष्ठ से कम कुछ भी नहीं करेंगे. यह कहानी है
+
+BATCHED TRANSLATION:
+जब आप खुद को छोड़ देते हैं, तो आप अपने देश को भी छोड़ देते हैं. अमेरिका की कहानी उन लोगों के बारे में नहीं है जिन्होंने जब चीजें कठिन हो गईं तो छोड़ दिया। यह उन लोगों की कहानी है जिन्होंने जारी रखा, जिन्होंने कड़ी मेहनत की, जिन्होंने अपने देश से बहुत प्यार किया कि वे अपना सर्वश्रेष्ठ से कम कुछ भी नहीं करेंगे. यह कहानी है
+
+====================================================================================================
+GROUP 33
+IDENTICAL: True
+SOURCE LENGTH: 250
+SINGLE LENGTH: 264
+BATCHED LENGTH: 264
+
+SOURCE:
+students who sat where you sit 250 years ago and went on to wage a revolution and they founded this nation. Young people. Students who sat where you sit 75 years ago who overcame a depression and won a world war, who fought for civil rights and put a
+
+SINGLE TRANSLATION:
+छात्र जो बैठे थे जहां आप बैठे हैं 250 साल पहले और आगे बढ़कर एक क्रांति शुरू की और उन्होंने इस राष्ट्र की स्थापना की. युवा लोग. छात्र जो बैठे हैं जहाँ आप बैठे हैं 75 साल पहले जो एक अवसाद को दूर किया और एक विश्व युद्ध जीता, जो नागरिक अधिकारों के लिए लड़ाई लड़ी और एक
+
+BATCHED TRANSLATION:
+छात्र जो बैठे थे जहां आप बैठे हैं 250 साल पहले और आगे बढ़कर एक क्रांति शुरू की और उन्होंने इस राष्ट्र की स्थापना की. युवा लोग. छात्र जो बैठे हैं जहाँ आप बैठे हैं 75 साल पहले जो एक अवसाद को दूर किया और एक विश्व युद्ध जीता, जो नागरिक अधिकारों के लिए लड़ाई लड़ी और एक
+
+====================================================================================================
+GROUP 37
+IDENTICAL: True
+SOURCE LENGTH: 191
+SINGLE LENGTH: 180
+BATCHED LENGTH: 180
+
+SOURCE:
+into everything you do. I expect great things from each of you. So don't let us down. Don't let your family down or your country down. Most of all, don't let yourself down. Make us all proud.
+
+SINGLE TRANSLATION:
+मैं आप सभी से महान चीजें उम्मीद करता हूं इसलिए हमें निराश मत करो अपने परिवार को या अपने देश को निराश मत करो सबसे महत्वपूर्ण बात यह है कि अपने आप को निराश न करें हम सभी को गर्व करें
+
+BATCHED TRANSLATION:
+मैं आप सभी से महान चीजें उम्मीद करता हूं इसलिए हमें निराश मत करो अपने परिवार को या अपने देश को निराश मत करो सबसे महत्वपूर्ण बात यह है कि अपने आप को निराश न करें हम सभी को गर्व करें
