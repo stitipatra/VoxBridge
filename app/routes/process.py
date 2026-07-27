@@ -549,10 +549,11 @@ def process_file(request: ProcessRequest, progress_callback=None):
             raise ValueError(
                 "Auto source language is not supported for text files yet")
 
-        translated_text = translate_text(
+        translated_text = translate_text_file(
             original_text,
             request.source_language,
-            request.target_language
+            request.target_language,
+            max_chars=450
         )
 
         translated_text_path = save_text_output(
@@ -643,6 +644,49 @@ def chunk_text(text: str, max_chars: int = 400) -> list[str]:
         chunks.append(" ".join(current_sentences))
 
     return chunks
+
+
+def translate_text_file(
+    text: str,
+    source_language: str,
+    target_language: str,
+    max_chars: int = 300
+) -> str:
+    translated_paragraphs = []
+
+    # Preserve actual paragraphs separated by blank lines.
+    paragraphs = re.split(r"\n\s*\n", text.strip())
+
+    for paragraph in paragraphs:
+        # Remove accidental line wrapping within the paragraph.
+        paragraph = re.sub(r"\s+", " ", paragraph).strip()
+
+        if not paragraph:
+            continue
+
+        chunks = chunk_text(
+            paragraph,
+            max_chars=max_chars
+        )
+
+        translated_chunks = []
+
+        for chunk in chunks:
+            translated_chunk = translate_text(
+                chunk,
+                source_language,
+                target_language
+            ).strip()
+
+            if translated_chunk:
+                translated_chunks.append(translated_chunk)
+
+        if translated_chunks:
+            translated_paragraphs.append(
+                " ".join(translated_chunks)
+            )
+
+    return "\n\n".join(translated_paragraphs)
 
 
 def translate_long_text(
