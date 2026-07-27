@@ -1,347 +1,1144 @@
+<div align="center">
+
 # अनुवादिनी
 
-> **Offline Multilingual Translation for Text, Audio, and Video with AI-generated Speech & Subtitles**
+### Breaking Language Barriers with Offline AI
 
-अनुवादिनी is an end-to-end offline AI-powered translation system that translates **text, audio, and video** into multiple languages while preserving accessibility through **speech synthesis** and **subtitle generation**. All processing is performed locally without requiring cloud services or API keys.
+**An AI-powered Offline Multimodal Translation Platform**
 
----
-
-## Demo
-
-![अनुवादिनी Demo](walkthrough/demo.gif)
+Translate **Text • Audio • Video** while automatically generating transcripts, subtitles, synchronized speech, and translated media — **completely offline**.
 
 ---
 
-# Features
+![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
+![Streamlit](https://img.shields.io/badge/Frontend-Streamlit-red)
+![FastAPI](https://img.shields.io/badge/API-FastAPI-green)
+![PyTorch](https://img.shields.io/badge/Framework-PyTorch-orange)
+![Transformers](https://img.shields.io/badge/Translation-NLLB--200-yellow)
+![Whisper](https://img.shields.io/badge/ASR-Faster--Whisper-blueviolet)
+![Offline](https://img.shields.io/badge/Mode-100%25_Offline-success)
 
-- 🌍 Offline multilingual translation
-- 🎥 Video translation with embedded subtitles
-- 🎵 Audio translation with AI-generated speech
-- 📄 Text translation with speech generation
-- 📝 Automatic subtitle (.srt) generation
-- 🎙️ Automatic speech recognition
-- 🔊 Male/Female voice selection
-- 🔒 Privacy-first local processing
-- 🚀 No internet or API keys required
-
-* 🖥️ Fully Offline AI Inference
-* 📱 Portrait & Landscape Subtitle Support
-* 🎨 Dynamic ASS Subtitle Rendering
-* 📦 Supports media uploads up to 2 GB
+</div>
 
 ---
 
-# Supported Languages
+# Overview
 
-| Language | Code |
-| -------- | ---- |
-| English  | en   |
-| Hindi    | hi   |
-| Marathi  | mr   |
+**Anuwadini** is an AI-powered offline multimodal translation platform designed to break language barriers across **text, speech, and video**.
 
----
+The platform automatically performs:
 
-# Technology Stack
+- Speech Recognition (ASR)
+- Neural Machine Translation
+- Subtitle Generation
+- AI Voice Synthesis (TTS)
+- Audio Synchronization
+- Final Video Rendering
 
-| Module               | Technology     |
-| -------------------- | -------------- |
-| Speech Recognition   | Faster-Whisper |
-| Translation          | NLLB-200       |
-| Speech Synthesis     | eSpeak NG      |
-| Video Processing     | FFmpeg         |
-| Backend Architecture | FastAPI        |
-| User Interface       | Streamlit      |
+Unlike cloud-based translation services, every stage of the pipeline executes **locally on the user's machine**, ensuring complete privacy, zero recurring API costs, and multilingual accessibility.
+
+Built using **Faster-Whisper**, **Meta NLLB-200**, **FFmpeg**, **FastAPI**, and **Streamlit**, Anuwadini provides an end-to-end translation workflow capable of processing multilingual media while remaining fully offline.
 
 ---
 
-# Processing Pipeline
+> **Privacy First. Offline by Design. Built for Multilingual Communication.**
+
+# ✨ Features
+
+## 🤖 AI Capabilities
+
+- 🌍 Multilingual translation across **Text, Audio, and Video**
+- 🎙️ Automatic Speech Recognition using **Faster-Whisper**
+- 🌐 Neural Machine Translation powered by **Meta NLLB-200**
+- 🗣️ Offline Text-to-Speech (TTS) synthesis
+- 📝 Automatic subtitle generation with timestamp alignment
+- 🔍 Automatic source language detection
+- 🎯 Neural machine translation using Meta NLLB-200
+
+---
+
+## 🎥 Media Processing
+
+- 📹 Video translation with translated speech
+- 🎵 Audio translation with regenerated voice output
+- 📄 Text translation across supported languages
+- 🎬 Automatic subtitle burn-in
+- 🎨 Styled ASS subtitle generation
+- 🔄 Audio-video synchronization after speech generation
+- 🎞️ Final translated media rendering using FFmpeg
+
+---
+
+## ⚡ Performance & Engineering
+
+- 💻 Runs **100% offline** — no internet required
+- 🔒 Privacy-first processing with no cloud uploads
+- 📦 Supports media files up to **2 GB**
+- 🚀 Modular translation pipeline designed for future performance optimizations
+- 🧩 Modular architecture for independent pipeline stages
+- 🔁 Retry-safe and resumable processing workflow
+
+---
+
+## 💻 User Experience
+
+- 🖥️ Interactive Streamlit interface
+- 📂 Simple upload-based workflow
+- 📈 Real-time processing progress updates
+- 📥 Download translated videos, audio, subtitles, and transcripts
+- 🎯 Clean and intuitive user interface
+
+# 🎬 Demo
+
+## End-to-End Walkthrough
+
+<p align="center">
+  <video src="assets/walkthrough.mp4" controls width="90%">
+    Your browser does not support the video tag.
+  </video>
+</p>
+
+> **Complete walkthrough of Anuwadini showcasing text, audio, and video translation, subtitle generation, speech synthesis, and final translated media output.**
+
+---
+
+## Translation Pipeline
 
 ```text
-Input (Text / Audio / Video)
-        │
-        ▼
-Speech Recognition (Faster-Whisper)
-        │
-        ▼
-Language Detection
-        │
-        ▼
-Translation (NLLB-200)
-        │
-        ▼
-Subtitle Generation
-        │
-        ▼
-Speech Synthesis (eSpeak NG)
-        │
-        ▼
-Video Rendering (FFmpeg)
-        │
-        ▼
-Translated Output
+                Input
+                  │
+      ┌───────────┼───────────┐
+      │           │           │
+    Text        Audio       Video
+      │           │           │
+      └───────────┼───────────┘
+                  │
+                  ▼
+      Automatic Language Detection
+                  │
+                  ▼
+      Speech Recognition (ASR)
+                  │
+                  ▼
+      Neural Machine Translation
+                  │
+                  ▼
+     Subtitle Generation (.SRT / .ASS)
+                  │
+                  ▼
+      Offline Text-to-Speech (TTS)
+                  │
+                  ▼
+        Audio Synchronization
+                  │
+                  ▼
+        Final Media Rendering
+                  │
+                  ▼
+      Translated Text • Audio • Video
 ```
 
 ---
 
-# Design Decisions
+## Generated Outputs
 
-अनुवादिनी prioritizes **translation quality**, **offline execution**, and **subtitle consistency** over aggressive parallel processing.
+Every translation request automatically produces:
 
-### Full-Context Translation
+- 🎥 Translated Video
+- 🎵 Translated Audio
+- 📝 Speech Transcript
+- 💬 Subtitle Files (`.srt` / `.ass`)
+- 🌍 Translated Text
+- 📦 Ready-to-download output files
 
-Instead of translating each Whisper segment independently, अनुवादिनी first generates a complete transcript and translates it as a single document.
+# 🏗️ System Architecture
 
-This approach:
+Anuwadini follows a modular pipeline architecture where each processing stage is isolated into independent components. This design improves maintainability, extensibility, and allows individual stages to be optimized without affecting the rest of the workflow.
 
-- Produces more natural translations.
-- Preserves sentence-level context.
-- Ensures the translated text shown in the UI exactly matches the embedded subtitles.
-- Simplifies debugging and deterministic processing.
+> **Architecture Diagram** _(Replace with the final diagram later)_
 
-### Audio Synchronization
-
-Languages differ in speaking speed and sentence structure.
-
-To preserve speech quality:
-
-- Small duration differences are automatically corrected.
-- Large differences are adjusted only within a safe playback-speed boundary.
-- Excessive slow-motion speech is intentionally avoided.
-- Video duration is always preserved and subtitles continue throughout the entire video.
-
-### Offline First
-
-The complete pipeline runs locally using Faster-Whisper, NLLB-200, eSpeak NG and FFmpeg.
-
-No cloud APIs, internet connection, or API keys are required after setup.
+```text
+                           User Input
+                                │
+         ┌──────────────────────┼──────────────────────┐
+         │                      │                      │
+       Text                  Audio                  Video
+         │                      │                      │
+         └──────────────────────┼──────────────────────┘
+                                │
+                                ▼
+                     Language Detection
+                                │
+                                ▼
+                   Faster-Whisper (ASR)
+                                │
+                                ▼
+                Meta NLLB-200 Translation
+                                │
+              ┌─────────────────┴─────────────────┐
+              │                                   │
+              ▼                                   ▼
+      Subtitle Generation                Text Output
+              │
+              ▼
+      Offline Text-to-Speech
+              │
+              ▼
+      Audio Synchronization
+              │
+              ▼
+      FFmpeg Video Rendering
+              │
+              ▼
+           Final Outputs
+```
 
 ---
 
-# Project Structure
+## Design Principles
+
+The architecture was built around the following engineering principles:
+
+- **Modularity** – Each processing stage is implemented as an independent service.
+- **Offline First** – No cloud APIs or internet connectivity required during translation.
+- **Privacy by Design** – User media never leaves the local machine.
+- **Extensibility** – Individual models or pipeline stages can be replaced without redesigning the application.
+- **Scalability** – The workflow supports large media files while maintaining a structured processing pipeline.
+
+# ⚙️ Technology Stack
+
+| Category                     | Technology                | Purpose                                                |
+| ---------------------------- | ------------------------- | ------------------------------------------------------ |
+| **Frontend**                 | Streamlit                 | Interactive web interface for translation workflow     |
+| **Backend API**              | FastAPI                   | Modular backend services and request handling          |
+| **Speech Recognition (ASR)** | Faster-Whisper            | High-performance multilingual speech-to-text           |
+| **Translation**              | Meta NLLB-200             | Offline neural machine translation                     |
+| **Speech Synthesis (TTS)**   | Piper TTS                 | Offline multilingual voice generation                  |
+| **Media Processing**         | FFmpeg                    | Audio extraction, synchronization, and video rendering |
+| **Deep Learning Framework**  | PyTorch                   | Model inference and execution                          |
+| **Machine Learning**         | Hugging Face Transformers | Loading and running NLLB translation models            |
+| **Subtitle Processing**      | SRT / ASS                 | Subtitle generation and styling                        |
+| **Programming Language**     | Python                    | Core application development                           |
+
+---
+
+# 🧠 Why These Technologies?
+
+### 🎙️ Faster-Whisper
+
+Chosen for fast, accurate, and fully offline multilingual speech recognition with significantly lower inference time compared to the original Whisper implementation.
+
+---
+
+### 🌍 Meta NLLB-200
+
+Provides high-quality neural machine translation across hundreds of languages while running entirely offline, eliminating dependency on cloud translation services.
+
+---
+
+### 🗣️ Piper TTS
+
+Generates natural-sounding speech locally without requiring external APIs, ensuring user privacy and offline accessibility.
+
+---
+
+### 🎬 FFmpeg
+
+Handles media processing tasks including:
+
+- Audio extraction
+- Subtitle embedding
+- Audio replacement
+- Video rendering
+- Media synchronization
+
+---
+
+### ⚡ FastAPI
+
+Provides a modular backend architecture, allowing each stage of the translation pipeline to remain independent and easily extensible.
+
+---
+
+### 🖥️ Streamlit
+
+Offers a lightweight and interactive interface that enables users to upload files, configure translations, monitor progress, and download generated outputs with minimal setup.
+
+# 📂 Repository Structure
 
 ```text
-अनुवादिनी
+Anuwadini/
 │
-├── app/
-│   ├── ai/
-│   ├── routes/
-│   ├── services/
-│   ├── config.py
-│   └── main.py
-│
-├── models/
-├── storage/
-├── tools/
-│   ├── espeak/
-│   └── ffmpeg/
-│
-├── streamlit_app.py
+├── app.py                  # Streamlit application entry point
+├── process.py              # End-to-end translation pipeline
 ├── requirements.txt
-└── README.md
+├── README.md
+│
+├── assets/                 # Images, demo GIFs, walkthrough videos
+│   ├── walkthrough.mp4
+│   ├── home.png
+│   └── ...
+│
+├── services/
+│   ├── transcription_service.py
+│   ├── translation_service.py
+│   ├── tts_service.py
+│   ├── subtitle_service.py
+│   └── ...
+│
+├── managers/
+│   ├── whisper_manager.py
+│   ├── translation_manager.py
+│   └── ...
+│
+├── utils/
+│   ├── file_utils.py
+│   ├── language_utils.py
+│   └── ...
+│
+├── outputs/                # Generated outputs
+│   ├── translated_video.mp4
+│   ├── translated_audio.wav
+│   ├── subtitles.srt
+│   ├── subtitles.ass
+│   └── transcript.txt
+│
+├── uploads/                # Temporary uploaded media
+│
+└── file_changes/           # Experimental implementations preserved for future development
 ```
 
 ---
 
-# Installation
+## Directory Overview
 
-Clone the repository
+| Directory         | Description                                                                 |
+| ----------------- | --------------------------------------------------------------------------- |
+| **assets/**       | Images, walkthrough videos, logos, and documentation resources              |
+| **services/**     | Core AI services such as ASR, translation, subtitle generation, and TTS     |
+| **managers/**     | Model loading, initialization, and lifecycle management                     |
+| **utils/**        | Helper utilities shared across the application                              |
+| **outputs/**      | Generated translated media and supporting files                             |
+| **uploads/**      | Temporary storage for user-uploaded media                                   |
+| **file_changes/** | Experimental implementations preserved for future optimization and research |
+
+# 🚀 Installation
+
+## Prerequisites
+
+Before getting started, ensure you have the following installed:
+
+- Python **3.10 or later** (Recommended: Python 3.12)
+- Git
+- FFmpeg (added to system PATH)
+- pip
+
+---
+
+## 1. Clone the Repository
 
 ```bash
-git clone https://github.com/<your-username>/अनुवादिनी.git
-
-cd अनुवादिनी
+git clone https://github.com/stitipatra/Anuwadini.git
+cd Anuwadini
 ```
 
-Create a virtual environment
+---
+
+## 2. Create a Virtual Environment
 
 ### Windows
 
 ```bash
 python -m venv venv
-
 venv\Scripts\activate
 ```
 
-Install dependencies
+### Linux / macOS
 
 ```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+---
+
+## 3. Install Dependencies
+
+```bash
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
 ---
 
-# Running अनुवादिनी
+## 4. Install FFmpeg
 
-Launch the application
+Anuwadini uses **FFmpeg** for audio extraction, synchronization, subtitle embedding, and final video rendering.
+
+### Windows
+
+1. Download FFmpeg.
+2. Extract the archive.
+3. Add the `bin` directory to your system `PATH`.
+
+Verify the installation:
+
+```bash
+ffmpeg -version
+```
+
+---
+
+## 5. Launch the Application
+
+```bash
+streamlit run app.py
+```
+
+The application will open automatically in your default browser.
+
+---
+
+# 🐍 Using an Older Python Version
+
+If multiple Python versions are installed, create the virtual environment using the desired interpreter.
+
+### Example (Python 3.10)
+
+```bash
+py -3.10 -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### Example (Python 3.11)
+
+```bash
+py -3.11 -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### Linux / macOS
+
+```bash
+python3.10 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+---
+
+## Verify Installation
+
+Run the following commands to verify your environment:
+
+```bash
+python --version
+ffmpeg -version
+streamlit --version
+```
+
+If all commands execute successfully, Anuwadini is ready to use.
+
+# 📖 Usage
+
+Anuwadini provides a simple workflow for translating **Text**, **Audio**, and **Video** while remaining completely offline.
+
+---
+
+## Step 1 — Launch the Application
 
 ```bash
 streamlit run streamlit_app.py
 ```
 
-The Streamlit interface will open automatically in your browser.
+Open the application in your browser.
 
 ---
 
-# Architecture
+## Step 2 — Upload Input
 
-Although the project is structured using **FastAPI** modules, the Streamlit frontend directly invokes the backend processing functions. This keeps deployment simple while maintaining a clean and modular architecture.
+Choose one of the supported input types:
 
-The processing pipeline is:
+- 📄 Text
+- 🎵 Audio
+- 🎥 Video
 
-```text
-Streamlit UI
-      │
-      ▼
-process_file()
-      │
-      ▼
-Transcription Service
-      │
-      ▼
-Translation Service
-      │
-      ▼
-TTS Service
-      │
-      ▼
-Video Service
-      │
-      ▼
-Output Files
-```
-
-The FastAPI application is retained to support future REST API integration without changing the processing logic.
+Supported media formats include common audio and video file types.
 
 ---
 
-# Scalability
+## Step 3 — Configure Translation
 
-Although the current implementation processes media using a single translation pipeline, the architecture has been intentionally designed to support future scaling.
+Select:
 
-Potential enhancements include:
+- Source Language _(or Auto Detect)_
+- Target Language
+- Translation Mode
 
-- Chunk-based transcription for long videos
-- Parallel Whisper inference
-- Queue-based worker processing
-- GPU-backed batch inference
-- Segment-level TTS alignment
-- Distributed media storage
-- REST API deployment using FastAPI
-- Real-time progress tracking
+The application automatically configures the required processing pipeline.
 
 ---
 
-# Supported Inputs
+## Step 4 — Start Translation
 
-### Text
+Click **Translate**.
 
-- `.txt`
+The application performs the following stages automatically:
 
-### Audio
+1. Language Detection
+2. Speech Recognition (ASR)
+3. Neural Machine Translation
+4. Subtitle Generation
+5. Speech Synthesis (TTS)
+6. Audio Synchronization
+7. Final Media Rendering
 
-- `.mp3`
-- `.wav`
-- `.m4a`
-- `.aac`
-- `.flac`
+Real-time progress updates are displayed throughout the pipeline.
+
+---
+
+## Step 5 — Download Results
+
+After processing completes, the generated outputs are available for download.
+
+Depending on the input type, outputs include:
+
+- 🎥 Translated Video
+- 🎵 Translated Audio
+- 📝 Transcript
+- 💬 Subtitle Files (.srt / .ass)
+- 🌍 Translated Text
+
+---
+
+# 🌍 Supported Languages
+
+Current language support includes:
+
+| Language | Text | Audio | Video |
+| -------- | :--: | :---: | :---: |
+| English  |  ✅  |  ✅   |  ✅   |
+| Hindi    |  ✅  |  ✅   |  ✅   |
+| Marathi  |  ✅  |  ✅   |  ✅   |
+
+The modular architecture allows additional languages to be integrated with minimal changes.
+
+---
+
+# 📁 Supported Input Formats
 
 ### Video
 
-- `.mp4`
-- `.mov`
-- `.mkv`
-- `.avi`
+- MP4
+- AVI
+- MOV
+- MKV
+- WEBM
+
+### Audio
+
+- WAV
+- MP3
+- M4A
+- FLAC
+- AAC
+
+### Text
+
+- Plain Text
+- TXT Files
 
 ---
 
-# Generated Outputs
+# 📤 Generated Outputs
 
-Depending on the input type, अनुवादिनी produces:
+For every successful translation, Anuwadini generates one or more of the following artifacts:
 
-- 📄 Translated Text
-- 🎙️ Transcript
-- 🌍 Translation
-- 🔊 AI-generated Speech
-- 📝 Original Subtitles (.srt)
-- 📝 Translated Subtitles (.srt)
-- 🎥 Final Translated Video
+| Output              | Description                                         |
+| ------------------- | --------------------------------------------------- |
+| 🎥 Translated Video | Original video with translated speech and subtitles |
+| 🎵 Translated Audio | Synthesized translated speech                       |
+| 📝 Transcript       | Speech-to-text transcription                        |
+| 💬 SRT Subtitle     | Standard subtitle format                            |
+| 🎨 ASS Subtitle     | Styled subtitle format                              |
+| 🌍 Translated Text  | Final translated text output                        |
+
+# 📊 Performance
+
+Performance was evaluated on CPU using long-form multilingual media to understand the execution time of each stage in the translation pipeline.
+
+## Pipeline Execution Time
+
+| Stage                      |          Execution Time |
+| -------------------------- | ----------------------: |
+| Audio Preparation          |                  ~0.6 s |
+| Speech Recognition (ASR)   |                  ~369 s |
+| Neural Machine Translation |                  ~560 s |
+| Subtitle Generation        |                  ~0.4 s |
+| Text-to-Speech (TTS)       |                  ~153 s |
+| Audio Synchronization      |                  ~0.5 s |
+| Video Rendering            |                   ~37 s |
+| **Total Pipeline**         | **~1123 s (~18.7 min)** |
+
+> **Note:** Performance varies depending on hardware specifications, media duration, selected languages, and model initialization.
 
 ---
 
-# Edge Cases Handled
+## Current Performance Characteristics
 
-- GPU unavailable → automatic CPU fallback
-- Portrait and landscape subtitle rendering
-- Cross-platform bundled FFmpeg and eSpeak support
-- Large media uploads (up to 2 GB)
-- Multiple video and audio formats
-- Dynamic subtitle scaling
+- Fully offline execution
+- No dependency on cloud APIs
+- Modular processing pipeline
+- Supports media files up to **2 GB**
+- Optimized for reliability and translation quality over latency
+
+---
+
+## Future Optimization Opportunities
+
+Several optimizations are planned for future releases, including:
+
+- Batched translation for long-form media
+- Parallel execution of independent pipeline stages
+- GPU acceleration
+- ONNX / TensorRT model optimization
+- Dynamic translation chunk sizing
+- Streaming translation for real-time processing
+
+These improvements are expected to significantly reduce end-to-end execution time while maintaining translation quality.
+
+# 💡 Engineering Decisions
+
+Anuwadini was designed with three primary objectives:
+
+1. **Complete Offline Operation**
+2. **High Translation Quality**
+3. **Modular and Extensible Architecture**
+
+The following design decisions were made to achieve these goals.
+
+---
+
+## 🌐 Offline-First Architecture
+
+Every stage of the pipeline executes locally on the user's machine.
+
+Unlike cloud-based translation services, Anuwadini does not require:
+
+- Internet connectivity
+- External APIs
+- API keys
+- Subscription services
+
+This ensures:
+
+- Complete user privacy
+- Zero recurring inference cost
+- Reliable operation in low-connectivity environments
+
+---
+
+## 🎙️ Faster-Whisper for Speech Recognition
+
+Faster-Whisper was selected because it provides:
+
+- High multilingual transcription accuracy
+- Significantly faster inference than the original Whisper implementation
+- Efficient CPU execution
 - Automatic language detection
-- Graceful handling of unsupported files
+
+It serves as the speech recognition backbone for audio and video inputs.
 
 ---
 
-# Highlights
+## 🌍 Meta NLLB-200 for Translation
 
-- ✅ Fully Offline
-- ✅ Privacy First
-- ✅ No API Keys
-- ✅ Local AI Processing
-- ✅ Cross-format Translation
-- ✅ Automatic Subtitle Generation
+Meta's NLLB-200 model was chosen to enable high-quality multilingual translation while remaining fully offline.
 
----
+Reasons for selection include:
 
-# Engineering Challenges & Solutions
-
-| Challenge                            | Solution                                                                      |
-| ------------------------------------ | ----------------------------------------------------------------------------- |
-| Incorrect Hindi subtitle rendering   | Migrated from SRT to ASS subtitles with bundled Noto Sans Devanagari font     |
-| Subtitle overflow on portrait videos | Dynamic font sizing, margins and language-specific wrapping                   |
-| Translation inconsistencies          | Adopted full-context translation instead of segment-wise translation          |
-| Audio/video duration mismatch        | Implemented bounded playback-speed adjustment while preserving speech quality |
-| Cross-platform deployment            | Bundled FFmpeg, fonts and eSpeak dependencies                                 |
-| Large file uploads                   | Increased Streamlit upload limit to support media files up to 2 GB            |
+- Broad multilingual support
+- Strong translation quality
+- Local inference without cloud dependency
+- Easy integration through Hugging Face Transformers
 
 ---
 
-# Future Enhancements
+## 🗣️ Hybrid Offline Text-to-Speech
 
-- Additional language support
-- Neural TTS voices (Piper / Coqui)
-- Segment-level TTS synchronization
-- Chunk-based transcription for very large videos
-- Parallel inference pipelines
+Different languages require different TTS capabilities.
+
+Anuwadini combines multiple offline speech synthesis engines to provide the best available voice quality across supported languages.
+
+This modular approach also allows future TTS engines to be integrated with minimal code changes.
+
+---
+
+## 🎬 FFmpeg-Based Media Processing
+
+FFmpeg is used throughout the media pipeline for:
+
+- Audio extraction
+- Audio replacement
+- Subtitle embedding
+- Video rendering
+- Media synchronization
+
+Using FFmpeg enables compatibility with a wide range of multimedia formats while maintaining high output quality.
+
+---
+
+## 🧩 Modular Service-Oriented Design
+
+The application is organized into independent services responsible for specific stages of the workflow.
+
+Examples include:
+
+- Speech Recognition
+- Translation
+- Text-to-Speech
+- Subtitle Generation
+- Media Processing
+
+This separation of responsibilities improves maintainability, testing, and future extensibility.
+
+---
+
+## ⚖️ Translation Quality over Raw Speed
+
+The current implementation prioritizes translation accuracy, consistency, and deterministic outputs over aggressive runtime optimization.
+
+The architecture has been intentionally designed to support future performance improvements without requiring significant structural changes.
+
+---
+
+## 🔒 Privacy by Design
+
+User files remain on the local machine throughout processing.
+
+No audio, video, transcripts, or translated content are transmitted to external servers, making the platform suitable for privacy-sensitive translation workflows.
+
+# 🚧 Engineering Challenges
+
+Building an end-to-end offline multilingual translation platform involved solving several engineering challenges across speech recognition, translation, media processing, and user experience.
+
+---
+
+## 🎙️ Accurate Speech Recognition
+
+Speech recognition quality directly impacts the quality of translation and speech synthesis.
+
+Challenges included:
+
+- Multiple accents and speaking styles
+- Background noise
+- Mixed-language speech
+- Long-duration media processing
+
+The pipeline was designed to produce reliable transcriptions while remaining fully offline.
+
+---
+
+## 🌍 Multilingual Translation
+
+Supporting multiple languages required selecting a translation model capable of balancing quality, inference speed, and offline execution.
+
+The translation component was designed as an independent module, allowing future improvements or alternative models to be integrated with minimal architectural changes.
+
+---
+
+## 💬 Subtitle Generation
+
+Generating subtitles involves more than translating text.
+
+The system needed to ensure:
+
+- Accurate timestamp alignment
+- Readable subtitle segmentation
+- Proper multilingual font rendering
+- Compatibility with multiple subtitle formats
+
+Support for both **SRT** and **ASS** subtitles provides flexibility for different playback environments.
+
+---
+
+## 🔊 Speech Synthesis
+
+Natural speech generation required balancing voice quality with execution speed.
+
+Different languages may require different synthesis approaches, so the TTS layer was designed to be modular and easily extensible.
+
+---
+
+## 🎬 Media Synchronization
+
+Translated speech often differs in duration from the original audio.
+
+Maintaining synchronization between translated speech, subtitles, and video required careful handling of media timelines before final rendering.
+
+---
+
+## 💻 Fully Offline Execution
+
+One of the primary goals of Anuwadini was complete offline operation.
+
+This required replacing cloud services with local AI models while ensuring that transcription, translation, speech synthesis, and media processing could execute entirely on the user's machine.
+
+---
+
+## 🧩 Modular Architecture
+
+The application was intentionally divided into independent services for:
+
+- Speech Recognition
+- Translation
+- Subtitle Generation
+- Text-to-Speech
+- Media Processing
+
+This separation improves maintainability, testing, debugging, and future feature development.
+
+
+# ⚠️ Known Limitations
+
+While Anuwadini provides a complete offline multilingual translation workflow, there are several areas identified for future enhancement.
+
+---
+
+## 🎙️ Speech Recognition Accuracy
+
+The quality of the final translation depends heavily on the accuracy of Automatic Speech Recognition (ASR).
+
+Factors such as:
+
+- Strong regional accents
+- Background noise
+- Rapid speech
+- Code-switched conversations
+- Low-quality recordings
+
+may reduce transcription accuracy, which can propagate to later stages of the pipeline.
+
+---
+
+## 🌍 Translation Quality
+
+Translation quality varies across language pairs and is influenced by the underlying multilingual translation model.
+
+Some complex idioms, domain-specific terminology, or culturally nuanced expressions may not always be translated perfectly.
+
+---
+
+## 🗣️ Text-to-Speech Voices
+
+Voice quality depends on the availability of offline TTS models for the selected language.
+
+Current voices prioritize offline accessibility and functionality over highly expressive or human-like speech.
+
+---
+
+## ⏱️ Processing Time
+
+As the entire pipeline executes locally without cloud acceleration, processing time increases with:
+
+- Media duration
+- Video resolution
+- CPU capabilities
+- Available system memory
+
+Long-form videos therefore require noticeably longer execution times than short clips.
+
+---
+
+## 💻 Hardware Dependency
+
+Inference performance depends on the user's hardware configuration.
+
+Systems equipped with dedicated GPUs can potentially achieve significantly faster execution once GPU inference support is enabled.
+
+---
+
+## 📹 Supported Workflows
+
+The current release focuses on offline batch translation of uploaded media.
+
+Real-time translation, live streaming, and microphone-based translation are not yet supported.
+
+# 🚀 Future Improvements
+
+Anuwadini has been designed with extensibility in mind. The modular architecture enables new models, languages, and processing techniques to be integrated with minimal structural changes.
+
+---
+
+## ⚡ Performance Optimizations
+
+Future work will focus on reducing end-to-end processing time while maintaining translation quality.
+
+Planned improvements include:
+
+- Batch translation for long-form media
+- Parallel execution of independent pipeline stages
+- GPU acceleration for ASR, Translation, and TTS
+- Dynamic translation chunk sizing
+- Intelligent caching of frequently used models
+- Memory-efficient inference for large media files
+
+---
+
+## 🎙️ Speech Recognition
+
+Future enhancements to the ASR pipeline include:
+
+- Improved transcription accuracy for Marathi
+- Better handling of code-switched multilingual conversations
+- Benchmarking larger Whisper models
+- Speaker diarization for multi-speaker conversations
+- Adaptive decoding strategies for noisy environments
+
+---
+
+## 🌍 Translation
+
+Planned translation improvements include:
+
+- Context-aware translation across long conversations
+- Translation memory for repeated phrases
+- Domain-specific translation support
+- Additional multilingual model benchmarking
+- Improved consistency for long-form media
+
+---
+
+## 🗣️ Text-to-Speech
+
+Future work on speech synthesis includes:
+
+- More natural multilingual voices
+- Speaker-aware voice generation
+- Voice selection options
+- Improved speech pacing and pronunciation
+- Additional offline TTS model support
+
+---
+
+## 🎥 Media Processing
+
+Upcoming enhancements include:
+
+- Real-time subtitle preview
+- Automatic subtitle styling options
+- Improved subtitle segmentation
+- Better synchronization between translated speech and video
+- Batch processing of multiple media files
+
+---
+
+## 🌐 Language Support
+
+Future releases aim to expand multilingual accessibility by supporting additional Indian and international languages while maintaining fully offline execution.
+
+---
+
+## 💻 User Experience
+
+Planned interface improvements include:
+
+- Drag-and-drop uploads
+- Live progress estimation
+- Translation history
+- Project management dashboard
+- User-configurable processing settings
+- Dark mode
+
+---
+
+## 🔌 Platform Enhancements
+
+Future versions may include:
+
+- Docker support
+- REST API
+- Desktop application
+- Cloud deployment option
+- Plugin architecture
+- Automated testing and CI/CD pipelines
+
+# 🗺️ Project Roadmap
+
+The roadmap below outlines the current capabilities of Anuwadini along with planned enhancements for future releases.
+
+---
+
+## ✅ Completed
+
+### Core Platform
+
+- Fully offline multilingual translation
+- Text translation
+- Audio translation
+- Video translation
+- Automatic language detection
+- Automatic Speech Recognition (ASR)
+- Neural Machine Translation
+- Offline Text-to-Speech (TTS)
+- Subtitle generation (SRT & ASS)
+- Audio synchronization
+- Final video rendering
+- Interactive Streamlit interface
+
+---
+
+## 🚧 In Progress
+
+Current areas of research and development include:
+
+- Performance optimization for long-form media
+- Improved multilingual speech recognition
+- Enhanced subtitle quality
+- More natural offline voice synthesis
+- Pipeline optimization for reduced inference time
+
+---
+
+## 🔜 Planned
+
+### Performance
+
+- Batch translation for long-form media
+- Parallel pipeline execution
+- GPU acceleration
+- Intelligent model caching
+
+### Speech Recognition
+
+- Improved Marathi transcription
+- Better handling of multilingual conversations
 - Speaker diarization
-- Voice cloning
-- Lip-sync alignment
-- Batch translation
-- GPU optimization
-- REST API deployment
-- Real-time translation
+- Noise-robust transcription
+
+### Translation
+
+- Context-aware translation
+- Translation memory
+- Improved consistency across long conversations
+- Additional multilingual model benchmarking
+
+### Media Processing
+
+- Better subtitle synchronization
+- Improved subtitle segmentation
+- Batch media processing
+- Advanced subtitle styling
+
+### User Experience
+
+- Drag-and-drop uploads
+- Translation history
+- Progress estimation
+- Configurable processing settings
+- Desktop application
 
 ---
 
-# Performance Characteristics
+## 🌟 Long-Term Vision
 
-- Fully offline inference
-- Runtime API cost: **₹0 / $0**
-- Modular service-oriented architecture
-- Supports text, audio and video translation
-- Supports English, Hindi and Marathi
-- Upload size up to **2 GB**
-- Cross-platform compatible (Windows, macOS and Linux)
+The long-term goal of Anuwadini is to become a comprehensive **offline multilingual communication platform** capable of enabling seamless translation across text, speech, and video while preserving user privacy.
+
+Future milestones include:
+
+- Support for additional Indian and international languages
+- Live microphone translation
+- Real-time streaming translation
+- REST API
+- Docker deployment
+- Plugin architecture
+- Cross-platform desktop application
+
+# 🤝 Contributing
+
+Contributions, feature requests, and suggestions are welcome.
+
+If you would like to improve Anuwadini, please follow these steps:
+
+1. Fork the repository
+2. Create a new feature branch
+
+```bash
+git checkout -b feature/your-feature
+```
+
+3. Commit your changes
+
+```bash
+git commit -m "Add your feature"
+```
+
+4. Push the branch
+
+```bash
+git push origin feature/your-feature
+```
+
+5. Open a Pull Request
+
+Please ensure that new features maintain the project's offline-first philosophy and modular architecture.
 
 ---
 
-# Author
+# 📄 License
+
+This project is licensed under the **MIT License**.
+
+You are free to use, modify, and distribute this software in accordance with the terms of the license.
+
+See the `LICENSE` file for more details.
+
+---
+
+# 🙏 Acknowledgements
+
+This project builds upon several outstanding open-source technologies.
+
+Special thanks to:
+
+- Meta AI for **NLLB-200**
+- Faster-Whisper for multilingual speech recognition
+- Hugging Face Transformers
+- PyTorch
+- Piper TTS
+- FFmpeg
+- Streamlit
+- FastAPI
+
+Their contributions to the open-source community made this project possible.
+
+---
+
+# 👨‍💻 Author
 
 **Stitiprangya Patra**
 
-BITS Pilani Goa Campus
+B.E. Electronics & Instrumentation Engineering + M.Sc. Mathematics  
+BITS Pilani, Goa Campus
+
+Software Engineer @ Nielsen
+
+### Connect with Me
+
+- GitHub: https://github.com/stitipatra
+- LinkedIn: https://www.linkedin.com/in/stitipatra/
+- Email: stitipatra@gmail.com
 
 ---
 
-# License
+<div align="center">
 
-This project is intended for educational and research purposes.
+### ⭐ If you found this project interesting, consider giving it a star!
+
+Thank you for visiting the repository.
+
+**Breaking Language Barriers with Offline AI.**
+
+</div>
