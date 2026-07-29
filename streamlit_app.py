@@ -43,7 +43,7 @@ def detect_input_type(filename: str) -> str:
     extension = os.path.splitext(filename)[1].lower()
     video_extensions = {".mp4", ".mov", ".mkv", ".avi"}
     audio_extensions = {".mp3", ".wav", ".m4a", ".aac", ".flac"}
-    text_extensions = {".txt", ".srt"}
+    text_extensions = {".txt", ".srt", ".docx", ".pdf"}
 
     if extension in video_extensions:
         return "video"
@@ -132,8 +132,8 @@ def mode_config(mode: str):
     configs = {
         "Text Translation": {
             "title": "Text Translation",
-            "subtitle": "Upload .txt or .srt files and translate them locally.",
-            "types": ["txt", "srt"],
+            "subtitle": "Upload TXT, SRT, DOCX or PDF files and translate them locally.",
+            "types": ["txt", "srt", "docx", "pdf"],
             "icon": "⌁",
         },
         "Audio Translation": {
@@ -154,7 +154,7 @@ def mode_config(mode: str):
         {
             "title": "Upload your file",
             "subtitle": "Choose text, audio or video — Anuwadini keeps the backend pipeline unchanged.",
-            "types": ["mp4", "mov", "mkv", "avi", "mp3", "wav", "m4a", "aac", "flac", "txt", "srt"],
+            "types": ["mp4", "mov", "mkv", "avi", "mp3", "wav", "m4a", "aac", "flac", "txt", "srt", "docx", "pdf"],
             "icon": "＋",
         },
     )
@@ -821,6 +821,9 @@ if st.session_state.selected_mode in ["Home", "Text Translation", "Audio Transla
             input_type = detect_input_type(uploaded_file.name)
             input_path = save_uploaded_file(uploaded_file, input_type)
 
+            # st.write("Saved to:", input_path)
+            # st.write("Exists:", os.path.exists(input_path))
+
             request = ProcessRequest(
                 input_type=input_type,
                 input_path=input_path,
@@ -1115,11 +1118,60 @@ if st.session_state.selected_mode in ["Home", "Text Translation", "Audio Transla
             download_button("🔊 Translated Audio", result.get(
                 "translated_audio_path"), "audio/wav")
         with d2:
-            st.markdown("##### 📄 Text")
-            download_button("📄 Transcript", result.get(
-                "transcript_path"), "text/plain")
-            download_button("🌐 Translation", result.get(
-                "translated_text_path"), "text/plain")
+            st.markdown("##### 📄 Documents")
+
+            download_button(
+                "📄 Transcript",
+                result.get("transcript_path"),
+                "text/plain",
+            )
+
+            download_button(
+                "🌐 Translation Text",
+                result.get("translated_text_path"),
+                "text/plain",
+            )
+
+            translated_document_path = result.get(
+                "translated_document_path"
+            )
+
+            translated_text_path = result.get(
+                "translated_text_path"
+            )
+
+            if (
+                translated_document_path
+                and translated_document_path != translated_text_path
+            ):
+                document_extension = os.path.splitext(
+                    translated_document_path
+                )[1].lower()
+
+                mime_types = {
+                    ".docx": (
+                        "application/vnd.openxmlformats-officedocument."
+                        "wordprocessingml.document"
+                    ),
+                    ".pdf": "application/pdf",
+                }
+
+                button_labels = {
+                    ".docx": "📘 Translated DOCX",
+                    ".pdf": "📕 Translated PDF",
+                }
+
+                download_button(
+                    button_labels.get(
+                        document_extension,
+                        "📄 Translated Document",
+                    ),
+                    translated_document_path,
+                    mime_types.get(
+                        document_extension,
+                        "application/octet-stream",
+                    ),
+                )
         with d3:
             st.markdown("##### 💬 Subtitles")
             download_button("📝 Original SRT", result.get(
@@ -1164,7 +1216,9 @@ elif st.session_state.selected_mode == "Settings":
         </div>
         <h3>Supported Input Types</h3>
         <div class="format-row">
-            <span class="pill">.txt</span><span class="pill">.srt</span><span class="pill">.mp3</span><span class="pill">.wav</span>
+            <span class="pill">.txt</span><span class="pill">.srt</span>
+            <span class="pill">.docx</span><span class="pill">.pdf</span>
+            <span class="pill">.mp3</span>
             <span class="pill">.m4a</span><span class="pill">.aac</span><span class="pill">.flac</span><span class="pill">.mp4</span>
             <span class="pill">.mov</span><span class="pill">.mkv</span><span class="pill">.avi</span>
         </div>

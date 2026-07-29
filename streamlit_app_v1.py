@@ -43,7 +43,7 @@ def detect_input_type(filename: str) -> str:
     extension = os.path.splitext(filename)[1].lower()
     video_extensions = {".mp4", ".mov", ".mkv", ".avi"}
     audio_extensions = {".mp3", ".wav", ".m4a", ".aac", ".flac"}
-    text_extensions = {".txt", ".srt"}
+    text_extensions = {".txt", ".srt", ".docx", ".pdf"}
 
     if extension in video_extensions:
         return "video"
@@ -133,7 +133,7 @@ def mode_config(mode: str):
         "Text Translation": {
             "title": "Text Translation",
             "subtitle": "Upload .txt or .srt files and translate them locally.",
-            "types": ["txt", "srt"],
+            "types": ["txt", "srt", "docx", "pdf"],
             "icon": "⌁",
         },
         "Audio Translation": {
@@ -154,7 +154,7 @@ def mode_config(mode: str):
         {
             "title": "Upload your file",
             "subtitle": "Choose text, audio or video — Anuwadini keeps the backend pipeline unchanged.",
-            "types": ["mp4", "mov", "mkv", "avi", "mp3", "wav", "m4a", "aac", "flac", "txt", "srt"],
+            "types": ["mp4", "mov", "mkv", "avi", "mp3", "wav", "m4a", "aac", "flac", "txt", "srt", "docx", "pdf"],
             "icon": "＋",
         },
     )
@@ -946,7 +946,7 @@ elif st.session_state.selected_mode == "Settings":
         </div>
         <h3>Supported Input Types</h3>
         <div class="format-row">
-            <span class="pill">.txt</span><span class="pill">.srt</span><span class="pill">.mp3</span><span class="pill">.wav</span>
+            <span class="pill">.txt</span><span class="pill">.srt</span><span class="pill">.docx</span><span class="pill">.pdf</span><span class="pill">.mp3</span><span class="pill">.wav</span>
             <span class="pill">.m4a</span><span class="pill">.aac</span><span class="pill">.flac</span><span class="pill">.mp4</span>
             <span class="pill">.mov</span><span class="pill">.mkv</span><span class="pill">.avi</span>
         </div>
