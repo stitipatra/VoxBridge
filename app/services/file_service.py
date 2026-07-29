@@ -9,7 +9,7 @@ TEXT_UPLOAD_DIR = os.path.join(BASE_STORAGE_DIR, "uploads", "text")
 AUDIO_UPLOAD_DIR = os.path.join(BASE_STORAGE_DIR, "uploads", "audio")
 VIDEO_UPLOAD_DIR = os.path.join(BASE_STORAGE_DIR, "uploads", "video")
 
-TEXT_EXTENSIONS = {".txt"}
+TEXT_EXTENSIONS = {".txt",".pdf",".docx"}
 AUDIO_EXTENSIONS = {".mp3", ".wav", ".aac", ".m4a", ".flac", ".wma", ".ogg"}
 VIDEO_EXTENSIONS = {".mp4", ".mov", ".avi", ".wmv", ".mkv", ".flv", ".webm"}
 

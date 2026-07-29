@@ -1,24 +1,14 @@
 
-========== TRANSLATION DIAGNOSTICS ==========
-Translation groups: 10
-Character lengths: min=80, max=300, avg=244.50
-Group lengths: [300, 242, 294, 276, 80, 258, 247, 272, 252, 224]
-=============================================
-
-
 ============================================================
 ANUWADINI PROCESSING TIME REPORT
 ============================================================
-Audio Preparation                0.30 sec (  0.03%)
-Transcription                  857.58 sec ( 77.99%)
-Translation                     58.46 sec (  5.32%)
-Subtitle Generation              0.46 sec (  0.04%)
-Tts Generation                  47.77 sec (  4.34%)
-Audio Synchronization            0.31 sec (  0.03%)
-Video Rendering                133.71 sec ( 12.16%)
-Cleanup                          0.01 sec (  0.00%)
-Unmeasured / Overhead            0.98 sec (  0.09%)
+Audio Preparation                0.04 sec (  0.34%)
+Transcription                    7.06 sec ( 56.43%)
+Translation                      1.96 sec ( 15.68%)
+Subtitle Generation              0.33 sec (  2.64%)
+Tts Generation                   2.46 sec ( 19.63%)
+Unmeasured / Overhead            0.66 sec (  5.28%)
 ------------------------------------------------------------
-Total                         1099.59 sec
+Total                           12.51 sec
 ============================================================
 

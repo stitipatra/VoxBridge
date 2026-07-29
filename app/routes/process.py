@@ -10,13 +10,20 @@ from app.services.media_service import extract_audio_from_video, convert_audio_t
 from app.services.transcription_service import transcribe_audio
 from app.services.subtitle_service import generate_srt, split_segments_for_subtitles, generate_ass
 from app.services.tts_service import generate_speech
+from app.services.document_service import load_document
+from docx import Document
 from typing import Callable, Optional
+from app.services.output_service import (
+    save_formatted_docx_output,
+    save_pdf_output,
+)
 from app.services.video_service import (
     merge_audio_with_video,
     get_video_dimensions,
     generate_segment_audio_clips,
     create_synchronized_audio
 )
+
 
 router = APIRouter(prefix="/process", tags=["Process"])
 
@@ -542,29 +549,64 @@ def process_file(request: ProcessRequest, progress_callback=None):
                 "status": "failed"
             }
 
-        with open(request.input_path, "r", encoding="utf-8") as file:
-            original_text = file.read()
+        original_text = load_document(request.input_path)
 
         if request.source_language == "auto":
             raise ValueError(
-                "Auto source language is not supported for text files yet")
+                "Auto source language is not supported for text files yet"
+            )
 
-        translated_text = translate_text_file(
-            original_text,
-            request.source_language,
-            request.target_language,
-            max_chars=450
-        )
+        input_extension = os.path.splitext(
+            request.input_path
+        )[1].lower()
+
+        translated_document_path = None
+
+        if input_extension == ".docx":
+            translated_paragraphs = translate_docx_paragraphs(
+                file_path=request.input_path,
+                source_language=request.source_language,
+                target_language=request.target_language,
+                max_chars=450,
+            )
+
+            translated_text = "\n\n".join(
+                paragraph
+                for paragraph in translated_paragraphs
+                if paragraph
+            )
+
+            translated_document_path = save_formatted_docx_output(
+                translated_paragraphs=translated_paragraphs,
+                input_path=request.input_path,
+            )
+
+        else:
+            translated_text = translate_text_file(
+                original_text,
+                request.source_language,
+                request.target_language,
+                max_chars=450,
+            )
+
+            if input_extension == ".pdf":
+                translated_document_path = save_pdf_output(
+                    translated_text=translated_text,
+                    input_path=request.input_path,
+                )
 
         translated_text_path = save_text_output(
             translated_text,
             "text_translation"
         )
 
+        if input_extension in {".txt", ".srt"}:
+            translated_document_path = translated_text_path
+
         translated_audio_path = generate_speech(
             translated_text,
             request.target_language,
-            request.voice_gender
+            request.voice_gender,
         )
 
         return {
@@ -576,6 +618,7 @@ def process_file(request: ProcessRequest, progress_callback=None):
             "original_text": original_text,
             "translated_text": translated_text,
             "translated_text_path": translated_text_path,
+            "translated_document_path": translated_document_path,
             "translated_audio_path": translated_audio_path,
             "status": "completed"
         }
@@ -687,6 +730,57 @@ def translate_text_file(
             )
 
     return "\n\n".join(translated_paragraphs)
+
+
+def translate_docx_paragraphs(
+    file_path: str,
+    source_language: str,
+    target_language: str,
+    max_chars: int = 450,
+    progress_callback=None,
+) -> list[str]:
+    document = Document(file_path)
+
+    source_paragraphs: list[str] = []
+
+    for paragraph in document.paragraphs:
+        text = paragraph.text.strip()
+
+        if text:
+            source_paragraphs.append(text)
+
+    # Include table cell paragraphs in the same order used by the output writer.
+    for table in document.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                for paragraph in cell.paragraphs:
+                    text = paragraph.text.strip()
+
+                    if text:
+                        source_paragraphs.append(text)
+
+    translated_paragraphs: list[str] = []
+    total = len(source_paragraphs)
+
+    for index, paragraph_text in enumerate(source_paragraphs, start=1):
+        translated_paragraph = translate_text_file(
+            text=paragraph_text,
+            source_language=source_language,
+            target_language=target_language,
+            max_chars=max_chars,
+        )
+
+        translated_paragraphs.append(
+            translated_paragraph.strip()
+        )
+
+        if progress_callback and total:
+            progress_callback(
+                index,
+                total,
+            )
+
+    return translated_paragraphs
 
 
 def translate_long_text(
